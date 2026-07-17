@@ -16,25 +16,26 @@ const programs = JSON.parse(readFileSync(join(ROOT, 'data/programs.data.json'), 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
 // ---- 地域バケット ----
+// 47都道府県 → ローマ字キー（region文字列に都道府県名が含まれれば自動でその県バケットに振り分け）
+const PREF_KEY = {
+  '北海道': 'hokkaido', '青森': 'aomori', '岩手': 'iwate', '宮城': 'miyagi', '秋田': 'akita', '山形': 'yamagata', '福島': 'fukushima',
+  '茨城': 'ibaraki', '栃木': 'tochigi', '群馬': 'gunma', '埼玉': 'saitama', '千葉': 'chiba', '東京': 'tokyo', '神奈川': 'kanagawa',
+  '新潟': 'niigata', '富山': 'toyama', '石川': 'ishikawa', '福井': 'fukui', '山梨': 'yamanashi', '長野': 'nagano', '岐阜': 'gifu', '静岡': 'shizuoka', '愛知': 'aichi',
+  '三重': 'mie', '滋賀': 'shiga', '京都': 'kyoto', '大阪': 'osaka', '兵庫': 'hyogo', '奈良': 'nara', '和歌山': 'wakayama',
+  '鳥取': 'tottori', '島根': 'shimane', '岡山': 'okayama', '広島': 'hiroshima', '山口': 'yamaguchi',
+  '徳島': 'tokushima', '香川': 'kagawa', '愛媛': 'ehime', '高知': 'kochi',
+  '福岡': 'fukuoka', '佐賀': 'saga', '長崎': 'nagasaki', '熊本': 'kumamoto', '大分': 'oita', '宮崎': 'miyazaki', '鹿児島': 'kagoshima', '沖縄': 'okinawa',
+};
+const PREF_ORDER = Object.keys(PREF_KEY); // 東京→京都の順序で、東京都に含まれる「京都」の誤マッチを回避
 function bucketOf(region) {
   if (region.includes('東京以外')) return { key: 'national', label: '全国' };
-  if (region.includes('東京')) return { key: 'tokyo', label: '東京' };
-  if (region.includes('神奈川') || region.includes('横浜')) return { key: 'kanagawa', label: '神奈川・横浜' };
-  if (region.includes('京都')) return { key: 'kyoto', label: '京都' };
-  if (region.includes('大阪') || region.includes('関西')) return { key: 'osaka', label: '大阪・関西' };
-  if (region.includes('愛知') || region.includes('名古屋')) return { key: 'nagoya', label: '名古屋・愛知' };
-  if (region.includes('福岡') || region.includes('北九州')) return { key: 'fukuoka', label: '福岡' };
+  if (region.includes('全国')) return { key: 'national', label: '全国' };
+  for (const s of PREF_ORDER) if (region.includes(s)) return { key: PREF_KEY[s], label: s };
+  if (region.includes('関西')) return { key: 'osaka', label: '大阪' };
   return { key: 'national', label: '全国' };
 }
-const BUCKETS = [
-  { key: 'national', label: '全国' },
-  { key: 'tokyo', label: '東京' },
-  { key: 'kanagawa', label: '神奈川・横浜' },
-  { key: 'kyoto', label: '京都' },
-  { key: 'osaka', label: '大阪・関西' },
-  { key: 'nagoya', label: '名古屋・愛知' },
-  { key: 'fukuoka', label: '福岡' },
-];
+const activeBucketKeys = new Set(programs.map((p) => bucketOf(p.region).key));
+const BUCKETS = [{ key: 'national', label: '全国' }, ...PREF_ORDER.filter((s) => activeBucketKeys.has(PREF_KEY[s])).map((s) => ({ key: PREF_KEY[s], label: s }))];
 // ---- ジャンル ----
 const GENRES = [
   { key: 'butai', tag: '舞台', label: '舞台芸術（演劇・舞踊・サーカス）', hero: '演劇・舞踊・ダンス・サーカス' },
@@ -170,8 +171,7 @@ function write(rel, html) {
     return `<a class="tile" href="genres/${g.key}.html"><b>${g.label}</b><div class="c">${n}制度・公開中</div></a>`;
   }).join('') + COMING.map((n) => `<div class="tile" style="opacity:.55"><b>${n}</b><div class="c">近日追加</div></div>`).join('');
 
-  // 地域: 全国＋47都道府県＋海外（対応済みはリンク、未対応はグレー）
-  const activePref = { '東京': 'tokyo', '神奈川': 'kanagawa', '京都': 'kyoto', '大阪': 'osaka', '愛知': 'nagoya', '福岡': 'fukuoka' };
+  // 地域: 全国＋47都道府県＋海外（制度がある県は自動でリンク有効化、無い県はグレー）
   const CHIHO = [
     ['北海道・東北', ['北海道', '青森', '岩手', '宮城', '秋田', '山形', '福島']],
     ['関東', ['茨城', '栃木', '群馬', '埼玉', '千葉', '東京', '神奈川']],
@@ -181,8 +181,8 @@ function write(rel, html) {
     ['四国', ['徳島', '香川', '愛媛', '高知']],
     ['九州・沖縄', ['福岡', '佐賀', '長崎', '熊本', '大分', '宮崎', '鹿児島', '沖縄']],
   ];
-  const prefChip = (name) => activePref[name]
-    ? `<a class="pref" href="regions/${activePref[name]}.html">${name}</a>`
+  const prefChip = (name) => activeBucketKeys.has(PREF_KEY[name])
+    ? `<a class="pref" href="regions/${PREF_KEY[name]}.html">${name}</a>`
     : `<span class="pref" title="準備中">${name}</span>`;
   const nationalN = programs.filter((p) => bucketOf(p.region).key === 'national').length;
   const regionPane = `
