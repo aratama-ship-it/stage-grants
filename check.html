@@ -1105,14 +1105,7 @@ function run(){
       <p class="verified">最終確認: 2026-07-17（募集要項PDFで一次確認）</p>
     </div></div>`;
   });
-  var svc=function(t,m,u){return '<a href="'+u+'" target="_blank" rel="noopener nofollow" style="display:block;border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:8px 0;text-decoration:none;color:var(--ink)"><div style="font-weight:600">'+t+'</div><div style="color:var(--sub);font-size:12.5px;margin-top:2px">'+m+'</div></a>';};
-  html+=`<div style="border-top:1px solid var(--line);margin-top:16px;padding-top:14px">
-    <h2 style="font-size:15px;margin:0 0 6px"><span class="n" style="display:none"></span>次のステップ・関連サービス</h2>
-    <p class="hint" style="margin:0 0 10px">申請・公演準備に役立つサービスへのリンクです。現在は情報提供で、将来 広告・アフィリエイトを掲載する場合はリンクごとに「広告」と明示します。</p>`
-    + svc('クラウドファンディング','入金までの立替・自己負担金の資金づくりに（Motion Gallery 等）','https://motion-gallery.net/')
-    + svc('会計・確定申告ソフト','助成の実績報告・独立会計に（freee／マネーフォワード クラウド）','https://www.freee.co.jp/')
-    + `</div>
-  <button class="cta" onclick="back()" style="background:#8a8d9a">← 条件を変更する</button></div>`;
+  html+=`<button class="cta" onclick="back()" style="background:#8a8d9a">← 条件を変更する</button></div>`;
 
   document.getElementById('form').classList.add('hidden');
   const res=document.getElementById('results');

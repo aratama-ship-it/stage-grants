@@ -102,7 +102,6 @@ ul.cond li:first-child{border-top:none}
 footer{border-top:1px solid var(--line);background:#fff;margin-top:30px}
 .foot-in{max-width:900px;margin:0 auto;padding:18px 14px;font-size:12px;color:var(--sub)}
 .foot-in a{color:var(--sub)}
-.next .tile .tag{margin-right:6px}
 </style>
 <script>window.__SITE_TRACKING={ga4:${JSON.stringify(ANALYTICS_GA4)},adsClient:${JSON.stringify(ADSENSE_CLIENT)},privacyUrl:${JSON.stringify(rel + 'privacy.html')}};</script>
 <script src="${rel}assets/tracking.js" defer></script>
@@ -134,20 +133,6 @@ function gitem(p, rel) {
 <div class="t">${esc(p.name)}</div>
 <div class="m">${esc(p.funder)} ・ ${esc(p.region)}</div>
 <div class="tags">${statusTags(p)}</div></a>`;
-}
-
-// 判定結果・制度ページ下の「次のステップ」送客ゾーン（文脈型）。
-// sponsored:false = 情報提供リンク（現状）。報酬発生の契約後に true にすると「広告」表示＆景表法対応。
-function nextSteps(p) {
-  const items = [];
-  if (/後払い|立替|精算/.test(p.cashflow)) {
-    items.push({ label: 'クラウドファンディング', desc: '入金までの立替・自己負担金の資金づくりに（Motion Gallery 等）', url: 'https://motion-gallery.net/', sponsored: false });
-  }
-  items.push({ label: '会計・確定申告ソフト', desc: '助成の実績報告・独立会計に（freee／マネーフォワード クラウド）', url: 'https://www.freee.co.jp/', sponsored: false });
-  items.push({ label: 'チラシ・印刷', desc: '公演のフライヤー印刷に（採択後の準備期に。ラクスル 等）', url: 'https://raksul.com/', sponsored: false });
-  return `<h2>次のステップ・関連サービス</h2>
-<p class="note">申請・公演準備に役立つサービスへのリンクです。現在は情報提供で、将来 広告・アフィリエイトを掲載する場合はリンクごとに「広告」と明示します。</p>
-<div class="tiles next">${items.map((it) => `<a class="tile" href="${esc(it.url)}" target="_blank" rel="noopener nofollow${it.sponsored ? ' sponsored' : ''}">${it.sponsored ? '<span class="tag dl">広告</span>' : ''}<b>${esc(it.label)}</b><div class="c">${esc(it.desc)}</div></a>`).join('')}</div>`;
 }
 
 function write(rel, html) {
@@ -271,7 +256,6 @@ ${p.funderQ ? `<div class="qbox"><b>助成元への確認事項</b><br>${esc(p.f
 </div>
 <p><a class="cta" href="../check.html">この条件で適格性をチェックする →</a></p>
 <!-- ad-slot: 記事内広告。ADSENSE_CLIENT 設定時に自動広告で配信（同意後のみ） -->
-${nextSteps(p)}
 ${related.length ? `<h2>同じ助成元の他の制度</h2>${related.map((q) => gitem(q, '../')).join('')}` : ''}
 <div class="discl">判定・掲載情報は募集要項の明示内容に基づく参考情報で、採択可能性や最終的な適格性を保証するものではありません。応募前に必ず公式の最新要項をご確認ください。</div>`;
   write(`grants/${p.id}.html`, layout({ title: `${esc(p.name)}｜${esc(p.funder)}の助成金｜${SITE_NAME}`, desc: `${esc(p.funder)}「${esc(p.name)}」。${esc(p.region)}／${esc(p.amount)}／支給:${esc(p.cashflow)}。締切・応募条件・出典を掲載。`, rel: '../', active: 'grants', body }));
@@ -302,8 +286,8 @@ write('privacy.html', layout({
 <h2>アクセス解析・Cookie</h2>
 <p>本サイトは、サービス改善のためのアクセス解析（Google Analytics 等）や広告配信のためにCookie等を利用する場合があります。これらを利用する際は、初回アクセス時に同意バナーを表示し、<strong>「同意する」を選んだ場合にのみ解析・広告のスクリプトを読み込みます</strong>。「拒否」を選んだ場合、これらは読み込まれません。${ANALYTICS_GA4 || ADSENSE_CLIENT ? '' : '（現時点では解析・広告は未導入で、Cookieによる追跡は行っていません。）'}</p>
 <p>同意の選択はお使いのブラウザに保存されます。取り消すには、ブラウザのサイトデータ（localStorage）を削除してください。</p>
-<h2>広告・アフィリエイト</h2>
-<p>広告・アフィリエイトリンクを掲載する場合は、報酬が発生するリンクごとに「広告」「PR」と明示します（景品表示法・ステルスマーケティング規制に準拠）。掲載する送客リンクが助成の判定結果・並び順に影響することはありません。</p>
+<h2>広告について</h2>
+<p>本サイトは運営費のためにディスプレイ広告（Google AdSense 等）を掲載する場合があります。広告の配信にはCookie等が利用され、上記のとおり同意した場合にのみ読み込まれます。広告の内容・配信は配信事業者により行われ、助成情報の掲載内容や適格性の判定結果・並び順に影響することはありません。（本サイトでは商用サービスへのアフィリエイト送客は行いません。）</p>
 <h2>個人情報</h2>
 <p>本サイトはお問い合わせ等でいただいた個人情報を、対応の目的以外に利用しません。第三者への提供は法令に基づく場合を除き行いません。</p>
 <p>お問い合わせ・訂正のご連絡は <a href="disclaimer.html">情報訂正の窓口</a> へ。</p>
