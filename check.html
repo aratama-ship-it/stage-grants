@@ -935,6 +935,106 @@ const PROGRAMS = [
     p=> (p.yearsActive>=1) ? PASS('1年以上の継続活動実績') : CHECK('1年以上の継続活動実績','補助年度4/1時点で満1年以上の活動実績が必要'),
   ]
  },
+ /* ===== 音楽（全国） ===== */
+ {
+  id:'kao_music', name:'花王芸術・科学財団 音楽公演への助成',
+  funder:'花王芸術・科学財団', region:'全国',
+  deadline:'例年10〜11月（2026年度分は終了・次回は2026秋頃）', dlUrgent:false,
+  amount:'上限100万円/件',
+  payment:'開催月の月初めに銀行振込（実質前払い型）',
+  cashflow:'開催時交付（実質前払い）',
+  src:'https://www.kao-foundation.or.jp/art/music_performance/',
+  rules:[
+    p=> isOrg(p) ? PASS('プロの音楽団体が主催') : FAIL('プロの音楽団体が主催','個人は対象外（団体のみ）'),
+    p=> p.genres.includes('音楽') ? PASS('音楽公演') : FAIL('音楽公演','音楽以外は対象外'),
+    p=> CHECK('創造的で採算の取りにくい音楽公演','芸術水準・企画性を要確認'),
+  ],
+  softNote:'4年連続受給は不可。国内開催を優先。'
+ },
+ {
+  id:'mutfa_music', name:'三菱UFJ信託芸術文化財団 クラシック音楽公演への助成',
+  funder:'三菱UFJ信託芸術文化財団', region:'全国',
+  deadline:'上期は11月末締切／下期(5月末)は終了', dlUrgent:false,
+  amount:'1件30〜200万円',
+  payment:'未確認',
+  cashflow:'未確認',
+  src:'https://mutfa.jp/pages/61/',
+  rules:[
+    p=> isOrg(p) ? PASS('プロのクラシック音楽団体が主催（法人格不要）') : FAIL('団体が主催','個人は対象外'),
+    p=> p.genres.includes('音楽') ? CHECK('クラシック音楽の公演','オペラ/オケ/室内楽/合唱/音楽祭等のクラシックか要確認') : FAIL('クラシック音楽の公演','音楽以外は対象外'),
+    p=> CHECK('収支見込が赤字（経済的支援が必要）の公演','収支見込を要確認'),
+  ],
+  softNote:'「地域文化財団」は別法人（アマチュア対象）。'
+ },
+ {
+  id:'rohm_music', name:'ローム ミュージック ファンデーション 音楽活動への助成',
+  funder:'ローム ミュージック ファンデーション', region:'全国',
+  deadline:'2026-07-21（受付中・2027年活動対象）', dlUrgent:true,
+  amount:'1件最大250万円',
+  payment:'未確認',
+  cashflow:'未確認 → 要問い合わせ',
+  src:'https://www.rmf.or.jp/jp/recruitment/subsidy/index.html',
+  rules:[
+    p=> PASS('個人・団体いずれも応募可'),
+    p=> p.genres.includes('音楽') ? PASS('音楽の公演・活動') : FAIL('音楽の公演・活動','音楽以外は対象外'),
+    p=> CHECK('音楽文化の普及・発展に貢献する活動','活動内容を要確認'),
+  ]
+ },
+ {
+  id:'affinis', name:'アフィニス オーケストラ助成',
+  funder:'アフィニス文化財団', region:'全国',
+  deadline:'2026年度要項公開済（締切時期は要項参照）', dlUrgent:false,
+  amount:'一企画50万〜100万円（1団体3件程度）',
+  payment:'未確認',
+  cashflow:'未確認',
+  src:'https://www.affinis.or.jp/guidance/points/',
+  rules:[
+    p=> isOrg(p) ? CHECK('常設のプロオーケストラに限定','固定メンバー・専属事務局・年10回以上の自主演奏会等の要件を満たすか要確認') : FAIL('常設プロオーケストラ','個人・非オケ団体は対象外'),
+    p=> p.genres.includes('音楽') ? PASS('オーケストラの自主演奏会') : FAIL('音楽（オーケストラ）','対象外'),
+  ]
+ },
+ {
+  id:'kakehashi', name:'かけはし芸術文化振興財団 公演活動助成',
+  funder:'かけはし芸術文化振興財団', region:'全国',
+  deadline:'例年10月〜1月上旬（次回は2026秋頃）', dlUrgent:false,
+  amount:'概ね10〜200万円',
+  payment:'未確認',
+  cashflow:'未確認',
+  src:'https://www.kakehashi-foundation.jp/activity/support/',
+  rules:[
+    p=> PASS('個人・団体いずれも応募可'),
+    p=> p.genres.includes('音楽') ? CHECK('電子技術を応用した音楽公演','電子技術・電子楽器の応用が必須。該当するか要確認') : FAIL('電子技術を応用した芸術文化','対象外'),
+  ],
+  softNote:'旧・ローランド芸術文化振興財団。'
+ },
+ {
+  id:'jcmf', name:'日本室内楽振興財団 助成',
+  funder:'日本室内楽振興財団（大阪）', region:'全国',
+  deadline:'例年9〜10月（2026年度分は終了・次回は2026秋頃）', dlUrgent:false,
+  amount:'補助率1/3以内・実額10〜100万円',
+  payment:'精算払（後払い）。事業報告書＋領収証提出後に交付',
+  cashflow:'後払い（立替必須）',
+  src:'https://jcmf.or.jp/about-jcmf/subsidy/',
+  rules:[
+    p=> p.genres.includes('音楽') ? CHECK('室内楽（2〜9重奏・声楽除く）','室内楽が対象。声楽・アマチュアは対象外') : FAIL('音楽（室内楽）','対象外'),
+    p=> PASS('演奏者（個人・団体）または音楽ホール等が申請可'),
+  ],
+  softNote:'「大阪国際室内楽コンクール」主催団体。'
+ },
+ {
+  id:'jfm_muneji', name:'宗次エンジェル基金 公演活動支援事業（日本演奏連盟）',
+  funder:'日本演奏連盟', region:'全国',
+  deadline:'前期終了（後期は追って発表）', dlUrgent:false,
+  amount:'演奏者数に応じ10〜20万円（定額）',
+  payment:'精算払（公演終了後4週間以内に報告→送金）',
+  cashflow:'後払い（立替必須）',
+  src:'https://www.jfm.or.jp/recruitment/activity_support.html',
+  rules:[
+    p=> CHECK('日本演奏連盟の正会員に限定','申請者・出演者全員が正会員（在籍1年以上）。会員でなければ不可'),
+    p=> p.genres.includes('音楽') ? PASS('クラシック音楽の有料公演') : FAIL('クラシック音楽','対象外'),
+  ],
+  softNote:'名古屋発の宗次エンジェル基金が原資、事務は東京の日本演奏連盟。'
+ },
 ];
 
 /* ---------- 判定 ---------- */
