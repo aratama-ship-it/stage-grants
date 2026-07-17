@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>京都の文化芸術 助成金一覧｜文化芸術 助成金ナビ</title>
+<meta name="description" content="京都で応募できる文化芸術・舞台芸術の助成金6制度。締切・助成額・支給時期つき。">
+<style>
+:root{--bg:#f2f3f7;--card:#fff;--ink:#1c1c22;--sub:#6a6d7a;--line:#e4e5ec;--accent:#3355e0;
+--ok:#1a8f5a;--ok-bg:#e6f5ee;--chk:#b7791f;--chk-bg:#fbf3e2;--dl:#c05621;--dl-bg:#fff4f0;
+--shadow:0 1px 3px rgba(20,20,40,.06),0 8px 24px rgba(20,20,40,.05)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.7;font-size:15px;
+font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.nav{background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:10}
+.nav-in{max-width:900px;margin:0 auto;display:flex;gap:4px;flex-wrap:wrap;align-items:center;padding:10px 14px}
+.brand{font-weight:700;font-size:15px;margin-right:10px;color:var(--ink)}
+.nav a{padding:6px 10px;border-radius:8px;font-size:13.5px;color:var(--sub)}
+.nav a.on{background:#eaeeff;color:var(--accent);font-weight:600}
+main{max-width:900px;margin:0 auto;padding:18px 14px 60px}
+h1{font-size:22px;margin:6px 0 6px}h2{font-size:17px;margin:26px 0 12px}
+.lede{color:var(--sub);margin:0 0 6px}
+.card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;margin:12px 0}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.tile{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px;display:block}
+.tile b{font-size:15px}.tile .c{color:var(--sub);font-size:12px}
+.stat{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0}
+.stat div{background:#fff;border-radius:10px;padding:10px 14px;box-shadow:var(--shadow)}
+.stat .n{font-size:22px;font-weight:700}.stat .l{font-size:12px;color:var(--sub)}
+.gitem{display:block;background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin:9px 0}
+.gitem:hover{border-color:var(--accent);text-decoration:none}
+.gitem .t{font-weight:600;color:var(--ink)}
+.gitem .m{color:var(--sub);font-size:12.5px;margin-top:2px}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.tag{font-size:11.5px;background:#f4f5fa;color:var(--sub);border-radius:6px;padding:3px 8px}
+.tag.cash{background:#eef3ff;color:var(--accent);font-weight:600}
+.tag.dl{background:var(--dl-bg);color:var(--dl);font-weight:600}
+.cta{display:inline-block;background:var(--accent);color:#fff;padding:11px 18px;border-radius:11px;font-weight:700}
+.cta:hover{text-decoration:none;opacity:.94}
+.kv{margin:10px 0}.kv .k{font-size:12px;color:var(--sub)}.kv .v{font-size:15px}
+ul.cond{margin:8px 0 0;padding-left:0;list-style:none}
+ul.cond li{padding:7px 0;border-top:1px dashed var(--line);font-size:14px}
+ul.cond li:first-child{border-top:none}
+.qbox{background:var(--chk-bg);border-radius:10px;padding:12px;margin-top:12px;font-size:13px;color:var(--chk)}
+.note{color:var(--sub);font-size:13px;margin-top:8px}
+.src{margin-top:12px;font-size:13px}
+.verified{color:var(--sub);font-size:12px;margin-top:6px}
+.discl{font-size:12px;color:var(--sub);background:#fff;border:1px dashed var(--line);border-radius:10px;padding:11px 13px;margin:16px 0}
+footer{border-top:1px solid var(--line);background:#fff;margin-top:30px}
+.foot-in{max-width:900px;margin:0 auto;padding:18px 14px;font-size:12px;color:var(--sub)}
+.foot-in a{color:var(--sub)}
+.hidden{display:none}
+.tabs{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px;margin:8px 0 6px}
+.tab{flex:1;padding:10px 6px;border:none;background:transparent;border-radius:9px;font-size:13.5px;font-weight:600;color:var(--sub);cursor:pointer;font-family:inherit}
+.tab.on{background:var(--accent);color:#fff}
+.tabpane{padding:6px 0 2px}
+.regionbar{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.prefgroup{margin:12px 0}
+.prefgroup .gh{font-size:12px;color:var(--sub);margin:0 0 6px}
+.prefs{display:flex;flex-wrap:wrap;gap:7px}
+.pref{font-size:13px;border:1px solid var(--line);border-radius:8px;padding:6px 11px;background:#fafafb;color:#b4b6c0}
+a.pref{color:var(--accent);border-color:#d7ddf6;background:#eef0fa;font-weight:600}
+a.pref:hover{text-decoration:none;border-color:var(--accent)}
+</style>
+<script>window.__SITE_TRACKING={ga4:"",adsClient:"",privacyUrl:"../privacy.html"};</script>
+<script src="../assets/tracking.js" defer></script>
+</head>
+<body>
+<div class="nav"><div class="nav-in"><span class="brand">文化芸術 助成金ナビ</span><a href="../index.html">ホーム</a><a href="../grants.html" class="on">助成金を探す</a><a href="../calendar.html">締切カレンダー</a><a href="../check.html">適格性チェック</a><a href="../about.html">このサイトについて</a></div></div>
+<main>
+<h1>京都の文化芸術 助成金（6制度）</h1>
+<p class="lede">京都で応募できる舞台芸術系の助成金。締切・助成額・支給時期・応募条件つき。</p>
+<h2>いま受付中（2）</h2><a class="gitem" href="../grants/kyoto_shorei.html">
+<div class="t">京都市芸術文化特別奨励制度</div>
+<div class="m">京都市 ・ 京都府京都市</div>
+<div class="tags"><span class="tag dl">締切: 2026-08-28（令和9年度・募集中）</span><span class="tag">1個人／1グループ 300万円（採択2名）</span><span class="tag cash">支給: 前払い型（活動前交付）</span></div></a><a class="gitem" href="../grants/kippu.html">
+<div class="t">U35創造支援プログラム KIPPU</div>
+<div class="m">京都芸術センター×ロームシアター京都×京都市 ・ 京都府京都市</div>
+<div class="tags"><span class="tag dl">締切: 2026-08-21（2027年度・募集中）</span><span class="tag">現物支援（制作室・会場費・設備等。現金給付なし）</span><span class="tag cash">支給: 現物支援（現金なし）</span></div></a>
+<h2>制度一覧</h2>
+<a class="gitem" href="../grants/kyoto_shorei.html">
+<div class="t">京都市芸術文化特別奨励制度</div>
+<div class="m">京都市 ・ 京都府京都市</div>
+<div class="tags"><span class="tag dl">締切: 2026-08-28（令和9年度・募集中）</span><span class="tag">1個人／1グループ 300万円（採択2名）</span><span class="tag cash">支給: 前払い型（活動前交付）</span></div></a><a class="gitem" href="../grants/arts_aid_kyoto.html">
+<div class="t">Arts Aid KYOTO 通常支援型</div>
+<div class="m">京都市 ・ 京都府京都市</div>
+<div class="tags"><span class="tag">2027年度分は例年5〜6月（2026年度分は終了）</span><span class="tag">一般A 上限100万／一般B 上限20万／若手交流 上限10万</span><span class="tag cash">支給: 一般枠は前払い可／若手枠は後払い</span></div></a><a class="gitem" href="../grants/kac_coprogram.html">
+<div class="t">京都芸術センター Co-program</div>
+<div class="m">京都市芸術文化協会（京都芸術センター） ・ 京都府京都市</div>
+<div class="tags"><span class="tag">2027年度分は例年10月（2026年度分は終了）</span><span class="tag">A・B 各100万／C 30万（制作費上限）</span><span class="tag cash">支給: 未確認（現物提供中心）</span></div></a><a class="gitem" href="../grants/kippu.html">
+<div class="t">U35創造支援プログラム KIPPU</div>
+<div class="m">京都芸術センター×ロームシアター京都×京都市 ・ 京都府京都市</div>
+<div class="tags"><span class="tag dl">締切: 2026-08-21（2027年度・募集中）</span><span class="tag">現物支援（制作室・会場費・設備等。現金給付なし）</span><span class="tag cash">支給: 現物支援（現金なし）</span></div></a><a class="gitem" href="../grants/rohm_research.html">
+<div class="t">ロームシアター京都 リサーチプログラム</div>
+<div class="m">京都市音楽芸術文化振興財団（ロームシアター京都） ・ 京都府京都市</div>
+<div class="tags"><span class="tag">例年4月（2026年度分は終了）</span><span class="tag">調査研究補助費（2026年度は18万円と告知・一部未確認）</span><span class="tag cash">支給: 未確認</span></div></a><a class="gitem" href="../grants/kyoto_challenge.html">
+<div class="t">京都府文化力チャレンジ補助金</div>
+<div class="m">京都府 ・ 京都府</div>
+<div class="tags"><span class="tag">例年4〜5月（令和8年度分は終了）</span><span class="tag">上限20万円（補助率2/3以内・京都市内は1/2以内）</span><span class="tag cash">支給: 未確認</span></div></a>
+<p class="note"><a href="../grants.html">← 全地域の一覧に戻る</a></p>
+</main>
+<footer><div class="foot-in">
+<!-- ad-slot: フッター広告（AdSense審査後に有効化） -->
+情報は2026-07-17に各公式サイト・募集要項で一次確認したものです（順次更新）。締切・条件は変動します。最終判断は各助成元の最新の募集要項でご確認ください。<br>
+<a href="../about.html">このサイトについて</a> ・ <a href="../privacy.html">プライバシー</a> ・ <a href="../disclaimer.html">免責事項・情報訂正</a>
+</div></footer>
+</body>
+</html>

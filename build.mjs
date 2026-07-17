@@ -19,15 +19,21 @@ const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').
 function bucketOf(region) {
   if (region.includes('東京以外')) return { key: 'national', label: '全国' };
   if (region.includes('東京')) return { key: 'tokyo', label: '東京' };
+  if (region.includes('神奈川') || region.includes('横浜')) return { key: 'kanagawa', label: '神奈川・横浜' };
+  if (region.includes('京都')) return { key: 'kyoto', label: '京都' };
   if (region.includes('大阪') || region.includes('関西')) return { key: 'osaka', label: '大阪・関西' };
   if (region.includes('愛知') || region.includes('名古屋')) return { key: 'nagoya', label: '名古屋・愛知' };
+  if (region.includes('福岡') || region.includes('北九州')) return { key: 'fukuoka', label: '福岡' };
   return { key: 'national', label: '全国' };
 }
 const BUCKETS = [
   { key: 'national', label: '全国' },
   { key: 'tokyo', label: '東京' },
+  { key: 'kanagawa', label: '神奈川・横浜' },
+  { key: 'kyoto', label: '京都' },
   { key: 'osaka', label: '大阪・関西' },
   { key: 'nagoya', label: '名古屋・愛知' },
+  { key: 'fukuoka', label: '福岡' },
 ];
 // ---- ジャンル ----
 const GENRES = [
@@ -165,7 +171,7 @@ function write(rel, html) {
   }).join('') + COMING.map((n) => `<div class="tile" style="opacity:.55"><b>${n}</b><div class="c">近日追加</div></div>`).join('');
 
   // 地域: 全国＋47都道府県＋海外（対応済みはリンク、未対応はグレー）
-  const activePref = { '東京': 'tokyo', '大阪': 'osaka', '愛知': 'nagoya' };
+  const activePref = { '東京': 'tokyo', '神奈川': 'kanagawa', '京都': 'kyoto', '大阪': 'osaka', '愛知': 'nagoya', '福岡': 'fukuoka' };
   const CHIHO = [
     ['北海道・東北', ['北海道', '青森', '岩手', '宮城', '秋田', '山形', '福島']],
     ['関東', ['茨城', '栃木', '群馬', '埼玉', '千葉', '東京', '神奈川']],
