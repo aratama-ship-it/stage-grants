@@ -105,6 +105,18 @@ ul.cond li:first-child{border-top:none}
 footer{border-top:1px solid var(--line);background:#fff;margin-top:30px}
 .foot-in{max-width:900px;margin:0 auto;padding:18px 14px;font-size:12px;color:var(--sub)}
 .foot-in a{color:var(--sub)}
+.hidden{display:none}
+.tabs{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px;margin:8px 0 6px}
+.tab{flex:1;padding:10px 6px;border:none;background:transparent;border-radius:9px;font-size:13.5px;font-weight:600;color:var(--sub);cursor:pointer;font-family:inherit}
+.tab.on{background:var(--accent);color:#fff}
+.tabpane{padding:6px 0 2px}
+.regionbar{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.prefgroup{margin:12px 0}
+.prefgroup .gh{font-size:12px;color:var(--sub);margin:0 0 6px}
+.prefs{display:flex;flex-wrap:wrap;gap:7px}
+.pref{font-size:13px;border:1px solid var(--line);border-radius:8px;padding:6px 11px;background:#fafafb;color:#b4b6c0}
+a.pref{color:var(--accent);border-color:#d7ddf6;background:#eef0fa;font-weight:600}
+a.pref:hover{text-decoration:none;border-color:var(--accent)}
 </style>
 <script>window.__SITE_TRACKING={ga4:${JSON.stringify(ANALYTICS_GA4)},adsClient:${JSON.stringify(ADSENSE_CLIENT)},privacyUrl:${JSON.stringify(rel + 'privacy.html')}};</script>
 <script src="${rel}assets/tracking.js" defer></script>
@@ -147,41 +159,73 @@ function write(rel, html) {
 // ---- トップ ----
 {
   const openList = openPrograms.map((p) => gitem(p, '')).join('') || '<p class="note">現在受付中の制度はありません。</p>';
-  const regionTiles = BUCKETS.map((b) => {
-    const n = programs.filter((p) => bucketOf(p.region).key === b.key).length;
-    return `<a class="tile" href="regions/${b.key}.html"><b>${b.label}</b><div class="c">${n}制度</div></a>`;
-  }).join('');
-  const genreTiles = [
-    ...GENRES.map((g) => {
-      const n = programs.filter((p) => genresOf(p).includes(g.tag)).length;
-      return `<a class="tile" href="genres/${g.key}.html"><b>${g.label}</b><div class="c">${n}制度・公開中</div></a>`;
-    }),
-    ...COMING.map((n) => `<div class="tile" style="opacity:.55"><b>${n}</b><div class="c">近日追加</div></div>`),
-  ].join('');
+  const genreTiles = GENRES.map((g) => {
+    const n = programs.filter((p) => genresOf(p).includes(g.tag)).length;
+    return `<a class="tile" href="genres/${g.key}.html"><b>${g.label}</b><div class="c">${n}制度・公開中</div></a>`;
+  }).join('') + COMING.map((n) => `<div class="tile" style="opacity:.55"><b>${n}</b><div class="c">近日追加</div></div>`).join('');
+
+  // 地域: 全国＋47都道府県＋海外（対応済みはリンク、未対応はグレー）
+  const activePref = { '東京': 'tokyo', '大阪': 'osaka', '愛知': 'nagoya' };
+  const CHIHO = [
+    ['北海道・東北', ['北海道', '青森', '岩手', '宮城', '秋田', '山形', '福島']],
+    ['関東', ['茨城', '栃木', '群馬', '埼玉', '千葉', '東京', '神奈川']],
+    ['中部', ['新潟', '富山', '石川', '福井', '山梨', '長野', '岐阜', '静岡', '愛知']],
+    ['近畿', ['三重', '滋賀', '京都', '大阪', '兵庫', '奈良', '和歌山']],
+    ['中国', ['鳥取', '島根', '岡山', '広島', '山口']],
+    ['四国', ['徳島', '香川', '愛媛', '高知']],
+    ['九州・沖縄', ['福岡', '佐賀', '長崎', '熊本', '大分', '宮崎', '鹿児島', '沖縄']],
+  ];
+  const prefChip = (name) => activePref[name]
+    ? `<a class="pref" href="regions/${activePref[name]}.html">${name}</a>`
+    : `<span class="pref" title="準備中">${name}</span>`;
+  const nationalN = programs.filter((p) => bucketOf(p.region).key === 'national').length;
+  const regionPane = `
+<div class="regionbar"><a class="pref" href="regions/national.html" style="font-size:14px;padding:9px 16px">全国（${nationalN}制度）</a></div>
+<p class="note" style="margin:0 0 6px">都道府県から探す（グレーは準備中。ユーザーの多い地域から順次追加します）</p>
+${CHIHO.map(([label, prefs]) => `<div class="prefgroup"><div class="gh">${label}</div><div class="prefs">${prefs.map(prefChip).join('')}</div></div>`).join('')}
+<div class="prefgroup"><div class="gh">海外</div><div class="prefs"><span class="pref" title="準備中">海外（準備中）</span></div></div>`;
+
+  const closedN = programs.length - openPrograms.length;
+  const deadlinePane = `
+<p class="note" style="margin:2px 0 12px">締切・募集状況から探す。日付つきの月別カレンダーは今後拡充します。</p>
+<div class="regionbar">
+<a class="pref" href="calendar.html" style="font-size:14px;padding:9px 16px">いま受付中（${openPrograms.length}件）</a>
+<a class="pref" href="calendar.html" style="font-size:14px;padding:9px 16px">募集終了・次回待ち（${closedN}件）</a>
+</div>
+<p><a class="cta" href="calendar.html">締切カレンダー・募集状況の一覧を見る →</a></p>`;
+
   const body = `
 <h1>あなたに合う文化芸術の助成金を、根拠つきで。</h1>
-<p class="lede">締切・助成額・「いつ入金されるか（支給時期）」・応募条件をまとめて確認。まずは舞台芸術から、全国＋東京・大阪・名古屋の${programs.length}制度を収録（無料）。</p>
+<p class="lede">締切・助成額・「いつ入金されるか（支給時期）」・応募条件をまとめて確認。舞台芸術・音楽・美術・映像・文芸/伝統芸能の${programs.length}制度を収録（無料）。</p>
 <div class="stat">
 <div><div class="n">${programs.length}</div><div class="l">収録制度</div></div>
 <div><div class="n">${openPrograms.length}</div><div class="l">いま受付中</div></div>
-<div><div class="n">全国+3都市</div><div class="l">対象地域</div></div>
+<div><div class="n">5</div><div class="l">ジャンル</div></div>
 </div>
 <p><a class="cta" href="check.html">適格性チェックを試す →</a></p>
 
-<h2>いま応募できる助成</h2>
+<div class="tabs" role="tablist">
+<button class="tab on" data-tab="genre" role="tab">ジャンルから探す</button>
+<button class="tab" data-tab="region" role="tab">地域から探す</button>
+<button class="tab" data-tab="deadline" role="tab">締切から探す</button>
+</div>
+<div class="tabpane" id="tab-genre"><div class="tiles">${genreTiles}</div></div>
+<div class="tabpane hidden" id="tab-region">${regionPane}</div>
+<div class="tabpane hidden" id="tab-deadline">${deadlinePane}</div>
+
+<h2>いま応募できる助成（${openPrograms.length}）</h2>
 ${openList}
 
-<h2>ジャンルから探す</h2>
-<div class="tiles">${genreTiles}</div>
-
-<h2>地域から探す</h2>
-<div class="tiles">${regionTiles}</div>
-
-<h2>締切から探す</h2>
-<p><a href="calendar.html">締切カレンダー・募集状況の一覧を見る →</a></p>
-
-<div class="discl">これは開発中のプロトタイプです。適格性の判定は募集要項の明示条件のみに基づく機械的なもので、採択可能性を示すものではありません。</div>`;
-  write('index.html', layout({ title: `${SITE_NAME}｜舞台芸術の助成金を根拠つきで探す`, desc: `文化芸術・クリエイターの助成金を、締切・助成額・支給時期・応募条件つきで探せる無料サイト。まずは舞台芸術${programs.length}制度を収録。`, rel: '', active: 'home', body }));
+<div class="discl">これは開発中のプロトタイプです。適格性の判定は募集要項の明示条件のみに基づく機械的なもので、採択可能性を示すものではありません。</div>
+<script>
+document.querySelectorAll('.tab').forEach(function(b){b.onclick=function(){
+document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on');});
+document.querySelectorAll('.tabpane').forEach(function(x){x.classList.add('hidden');});
+b.classList.add('on');
+document.getElementById('tab-'+b.dataset.tab).classList.remove('hidden');
+};});
+</script>`;
+  write('index.html', layout({ title: `${SITE_NAME}｜文化芸術の助成金を根拠つきで探す`, desc: `文化芸術・クリエイターの助成金を、締切・助成額・支給時期・応募条件つきで探せる無料サイト。舞台芸術・音楽・美術・映像・文芸/伝統芸能の${programs.length}制度を収録。`, rel: '', active: 'home', body }));
 }
 
 // ---- 制度一覧 ----

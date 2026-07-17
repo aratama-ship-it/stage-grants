@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>文化芸術 助成金ナビ｜舞台芸術の助成金を根拠つきで探す</title>
-<meta name="description" content="文化芸術・クリエイターの助成金を、締切・助成額・支給時期・応募条件つきで探せる無料サイト。まずは舞台芸術72制度を収録。">
+<title>文化芸術 助成金ナビ｜文化芸術の助成金を根拠つきで探す</title>
+<meta name="description" content="文化芸術・クリエイターの助成金を、締切・助成額・支給時期・応募条件つきで探せる無料サイト。舞台芸術・音楽・美術・映像・文芸/伝統芸能の72制度を収録。">
 <style>
 :root{--bg:#f2f3f7;--card:#fff;--ink:#1c1c22;--sub:#6a6d7a;--line:#e4e5ec;--accent:#3355e0;
 --ok:#1a8f5a;--ok-bg:#e6f5ee;--chk:#b7791f;--chk-bg:#fbf3e2;--dl:#c05621;--dl-bg:#fff4f0;
@@ -51,6 +51,18 @@ ul.cond li:first-child{border-top:none}
 footer{border-top:1px solid var(--line);background:#fff;margin-top:30px}
 .foot-in{max-width:900px;margin:0 auto;padding:18px 14px;font-size:12px;color:var(--sub)}
 .foot-in a{color:var(--sub)}
+.hidden{display:none}
+.tabs{display:flex;gap:6px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:5px;margin:8px 0 6px}
+.tab{flex:1;padding:10px 6px;border:none;background:transparent;border-radius:9px;font-size:13.5px;font-weight:600;color:var(--sub);cursor:pointer;font-family:inherit}
+.tab.on{background:var(--accent);color:#fff}
+.tabpane{padding:6px 0 2px}
+.regionbar{display:flex;flex-wrap:wrap;gap:8px;margin:4px 0 12px}
+.prefgroup{margin:12px 0}
+.prefgroup .gh{font-size:12px;color:var(--sub);margin:0 0 6px}
+.prefs{display:flex;flex-wrap:wrap;gap:7px}
+.pref{font-size:13px;border:1px solid var(--line);border-radius:8px;padding:6px 11px;background:#fafafb;color:#b4b6c0}
+a.pref{color:var(--accent);border-color:#d7ddf6;background:#eef0fa;font-weight:600}
+a.pref:hover{text-decoration:none;border-color:var(--accent)}
 </style>
 <script>window.__SITE_TRACKING={ga4:"",adsClient:"",privacyUrl:"privacy.html"};</script>
 <script src="assets/tracking.js" defer></script>
@@ -60,15 +72,34 @@ footer{border-top:1px solid var(--line);background:#fff;margin-top:30px}
 <main>
 
 <h1>あなたに合う文化芸術の助成金を、根拠つきで。</h1>
-<p class="lede">締切・助成額・「いつ入金されるか（支給時期）」・応募条件をまとめて確認。まずは舞台芸術から、全国＋東京・大阪・名古屋の72制度を収録（無料）。</p>
+<p class="lede">締切・助成額・「いつ入金されるか（支給時期）」・応募条件をまとめて確認。舞台芸術・音楽・美術・映像・文芸/伝統芸能の72制度を収録（無料）。</p>
 <div class="stat">
 <div><div class="n">72</div><div class="l">収録制度</div></div>
 <div><div class="n">11</div><div class="l">いま受付中</div></div>
-<div><div class="n">全国+3都市</div><div class="l">対象地域</div></div>
+<div><div class="n">5</div><div class="l">ジャンル</div></div>
 </div>
 <p><a class="cta" href="check.html">適格性チェックを試す →</a></p>
 
-<h2>いま応募できる助成</h2>
+<div class="tabs" role="tablist">
+<button class="tab on" data-tab="genre" role="tab">ジャンルから探す</button>
+<button class="tab" data-tab="region" role="tab">地域から探す</button>
+<button class="tab" data-tab="deadline" role="tab">締切から探す</button>
+</div>
+<div class="tabpane" id="tab-genre"><div class="tiles"><a class="tile" href="genres/butai.html"><b>舞台芸術（演劇・舞踊・サーカス）</b><div class="c">46制度・公開中</div></a><a class="tile" href="genres/ongaku.html"><b>音楽</b><div class="c">38制度・公開中</div></a><a class="tile" href="genres/bijutsu.html"><b>美術・現代アート</b><div class="c">32制度・公開中</div></a><a class="tile" href="genres/eizo.html"><b>映像・映画</b><div class="c">24制度・公開中</div></a><a class="tile" href="genres/bungei.html"><b>文芸・伝統芸能ほか</b><div class="c">21制度・公開中</div></a></div></div>
+<div class="tabpane hidden" id="tab-region">
+<div class="regionbar"><a class="pref" href="regions/national.html" style="font-size:14px;padding:9px 16px">全国（54制度）</a></div>
+<p class="note" style="margin:0 0 6px">都道府県から探す（グレーは準備中。ユーザーの多い地域から順次追加します）</p>
+<div class="prefgroup"><div class="gh">北海道・東北</div><div class="prefs"><span class="pref" title="準備中">北海道</span><span class="pref" title="準備中">青森</span><span class="pref" title="準備中">岩手</span><span class="pref" title="準備中">宮城</span><span class="pref" title="準備中">秋田</span><span class="pref" title="準備中">山形</span><span class="pref" title="準備中">福島</span></div></div><div class="prefgroup"><div class="gh">関東</div><div class="prefs"><span class="pref" title="準備中">茨城</span><span class="pref" title="準備中">栃木</span><span class="pref" title="準備中">群馬</span><span class="pref" title="準備中">埼玉</span><span class="pref" title="準備中">千葉</span><a class="pref" href="regions/tokyo.html">東京</a><span class="pref" title="準備中">神奈川</span></div></div><div class="prefgroup"><div class="gh">中部</div><div class="prefs"><span class="pref" title="準備中">新潟</span><span class="pref" title="準備中">富山</span><span class="pref" title="準備中">石川</span><span class="pref" title="準備中">福井</span><span class="pref" title="準備中">山梨</span><span class="pref" title="準備中">長野</span><span class="pref" title="準備中">岐阜</span><span class="pref" title="準備中">静岡</span><a class="pref" href="regions/nagoya.html">愛知</a></div></div><div class="prefgroup"><div class="gh">近畿</div><div class="prefs"><span class="pref" title="準備中">三重</span><span class="pref" title="準備中">滋賀</span><span class="pref" title="準備中">京都</span><a class="pref" href="regions/osaka.html">大阪</a><span class="pref" title="準備中">兵庫</span><span class="pref" title="準備中">奈良</span><span class="pref" title="準備中">和歌山</span></div></div><div class="prefgroup"><div class="gh">中国</div><div class="prefs"><span class="pref" title="準備中">鳥取</span><span class="pref" title="準備中">島根</span><span class="pref" title="準備中">岡山</span><span class="pref" title="準備中">広島</span><span class="pref" title="準備中">山口</span></div></div><div class="prefgroup"><div class="gh">四国</div><div class="prefs"><span class="pref" title="準備中">徳島</span><span class="pref" title="準備中">香川</span><span class="pref" title="準備中">愛媛</span><span class="pref" title="準備中">高知</span></div></div><div class="prefgroup"><div class="gh">九州・沖縄</div><div class="prefs"><span class="pref" title="準備中">福岡</span><span class="pref" title="準備中">佐賀</span><span class="pref" title="準備中">長崎</span><span class="pref" title="準備中">熊本</span><span class="pref" title="準備中">大分</span><span class="pref" title="準備中">宮崎</span><span class="pref" title="準備中">鹿児島</span><span class="pref" title="準備中">沖縄</span></div></div>
+<div class="prefgroup"><div class="gh">海外</div><div class="prefs"><span class="pref" title="準備中">海外（準備中）</span></div></div></div>
+<div class="tabpane hidden" id="tab-deadline">
+<p class="note" style="margin:2px 0 12px">締切・募集状況から探す。日付つきの月別カレンダーは今後拡充します。</p>
+<div class="regionbar">
+<a class="pref" href="calendar.html" style="font-size:14px;padding:9px 16px">いま受付中（11件）</a>
+<a class="pref" href="calendar.html" style="font-size:14px;padding:9px 16px">募集終了・次回待ち（61件）</a>
+</div>
+<p><a class="cta" href="calendar.html">締切カレンダー・募集状況の一覧を見る →</a></p></div>
+
+<h2>いま応募できる助成（11）</h2>
 <a class="gitem" href="grants/act_c1.html">
 <div class="t">東京芸術文化創造発信助成 カテゴリーI（芸術創造・単年）</div>
 <div class="m">アーツカウンシル東京 ・ 東京都</div>
@@ -104,16 +135,15 @@ footer{border-top:1px solid var(--line);background:#fff;margin-top:30px}
 <div class="m">美術工芸振興佐藤基金 ・ 全国</div>
 <div class="tags"><span class="tag dl">締切: 2026-09-18（受付中の可能性・要確認）</span><span class="tag">1件 上限約70万円（総額350万・5件程度）</span><span class="tag cash">支給: 未確認</span></div></a>
 
-<h2>ジャンルから探す</h2>
-<div class="tiles"><a class="tile" href="genres/butai.html"><b>舞台芸術（演劇・舞踊・サーカス）</b><div class="c">46制度・公開中</div></a><a class="tile" href="genres/ongaku.html"><b>音楽</b><div class="c">38制度・公開中</div></a><a class="tile" href="genres/bijutsu.html"><b>美術・現代アート</b><div class="c">32制度・公開中</div></a><a class="tile" href="genres/eizo.html"><b>映像・映画</b><div class="c">24制度・公開中</div></a><a class="tile" href="genres/bungei.html"><b>文芸・伝統芸能ほか</b><div class="c">21制度・公開中</div></a></div>
-
-<h2>地域から探す</h2>
-<div class="tiles"><a class="tile" href="regions/national.html"><b>全国</b><div class="c">54制度</div></a><a class="tile" href="regions/tokyo.html"><b>東京</b><div class="c">11制度</div></a><a class="tile" href="regions/osaka.html"><b>大阪・関西</b><div class="c">4制度</div></a><a class="tile" href="regions/nagoya.html"><b>名古屋・愛知</b><div class="c">3制度</div></a></div>
-
-<h2>締切から探す</h2>
-<p><a href="calendar.html">締切カレンダー・募集状況の一覧を見る →</a></p>
-
 <div class="discl">これは開発中のプロトタイプです。適格性の判定は募集要項の明示条件のみに基づく機械的なもので、採択可能性を示すものではありません。</div>
+<script>
+document.querySelectorAll('.tab').forEach(function(b){b.onclick=function(){
+document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('on');});
+document.querySelectorAll('.tabpane').forEach(function(x){x.classList.add('hidden');});
+b.classList.add('on');
+document.getElementById('tab-'+b.dataset.tab).classList.remove('hidden');
+};});
+</script>
 </main>
 <footer><div class="foot-in">
 <!-- ad-slot: フッター広告（AdSense審査後に有効化） -->
