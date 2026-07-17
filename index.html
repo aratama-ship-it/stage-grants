@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>舞台芸術 助成金 適格性チェック（プロトタイプ）</title>
+<style>
+  :root{
+    --bg:#f2f3f7; --card:#fff; --ink:#1c1c22; --sub:#6a6d7a; --line:#e4e5ec;
+    --accent:#3355e0; --ok:#1a8f5a; --ok-bg:#e6f5ee; --ng:#c0392b; --ng-bg:#fbeceb;
+    --chk:#b7791f; --chk-bg:#fbf3e2; --shadow:0 1px 3px rgba(20,20,40,.06),0 8px 24px rgba(20,20,40,.05);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
+    line-height:1.6;font-size:15px;padding-bottom:60px}
+  header{padding:22px 18px 14px;max-width:760px;margin:0 auto}
+  h1{font-size:19px;margin:0 0 4px;letter-spacing:.01em}
+  .lede{color:var(--sub);font-size:13px;margin:0}
+  .proto-tag{display:inline-block;font-size:11px;color:var(--accent);border:1px solid var(--accent);
+    border-radius:20px;padding:1px 9px;margin-top:8px;font-weight:600}
+  main{max-width:760px;margin:0 auto;padding:0 14px}
+  .card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:18px;margin:14px 0}
+  .card h2{font-size:15px;margin:0 0 14px;display:flex;align-items:center;gap:8px}
+  .card h2 .n{background:var(--accent);color:#fff;width:22px;height:22px;border-radius:50%;
+    display:grid;place-items:center;font-size:12px;flex:none}
+  label{display:block;font-size:12px;color:var(--sub);margin:12px 0 5px;font-weight:600}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  input,select{width:100%;padding:11px 12px;border:1px solid var(--line);border-radius:11px;
+    font-size:15px;background:#fbfbfd;color:var(--ink);font-family:inherit}
+  input:focus,select:focus{outline:none;border-color:var(--accent);background:#fff}
+  .seg{display:flex;gap:8px;flex-wrap:wrap}
+  .seg button{flex:1;min-width:80px;padding:10px;border:1px solid var(--line);background:#fbfbfd;
+    border-radius:11px;font-size:14px;cursor:pointer;color:var(--ink);font-family:inherit}
+  .seg button.on{background:var(--accent);color:#fff;border-color:var(--accent);font-weight:600}
+  .chips{display:flex;gap:8px;flex-wrap:wrap}
+  .chips button{padding:7px 13px;border:1px solid var(--line);background:#fbfbfd;border-radius:20px;
+    font-size:13px;cursor:pointer;color:var(--ink);font-family:inherit}
+  .chips button.on{background:#eaeeff;color:var(--accent);border-color:var(--accent);font-weight:600}
+  .hint{font-size:11px;color:var(--sub);margin-top:4px}
+  .cta{width:100%;padding:15px;background:var(--accent);color:#fff;border:none;border-radius:13px;
+    font-size:16px;font-weight:700;cursor:pointer;margin-top:20px;font-family:inherit}
+  .cta:active{transform:translateY(1px)}
+  .hidden{display:none}
+  /* results */
+  .summary{display:flex;gap:8px;margin:6px 0 4px;flex-wrap:wrap}
+  .pill{border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700}
+  .pill.ok{background:var(--ok-bg);color:var(--ok)}
+  .pill.chk{background:var(--chk-bg);color:var(--chk)}
+  .pill.ng{background:var(--ng-bg);color:var(--ng)}
+  .res{border:1px solid var(--line);border-radius:14px;margin:12px 0;overflow:hidden}
+  .res-head{padding:14px 15px;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;cursor:pointer}
+  .res-head:hover{background:#fafbff}
+  .res-title{font-size:15px;font-weight:700;margin:0}
+  .res-funder{font-size:12px;color:var(--sub);margin:2px 0 0}
+  .verdict{border-radius:10px;padding:5px 11px;font-size:12.5px;font-weight:700;white-space:nowrap;flex:none}
+  .verdict.ok{background:var(--ok-bg);color:var(--ok)}
+  .verdict.chk{background:var(--chk-bg);color:var(--chk)}
+  .verdict.ng{background:var(--ng-bg);color:var(--ng)}
+  .res-body{padding:0 15px 15px;border-top:1px solid var(--line)}
+  .meta{display:flex;flex-wrap:wrap;gap:6px;margin:12px 0}
+  .tag{font-size:11.5px;background:#f4f5fa;color:var(--sub);border-radius:7px;padding:3px 8px}
+  .tag.cash{background:#eef3ff;color:var(--accent);font-weight:600}
+  .tag.dl{background:#fff4f0;color:#c05621;font-weight:600}
+  .rule{display:flex;gap:9px;padding:8px 0;border-top:1px dashed var(--line);font-size:13px}
+  .rule:first-of-type{border-top:none}
+  .rule .ic{flex:none;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;
+    font-size:11px;color:#fff;margin-top:2px}
+  .rule.pass .ic{background:var(--ok)} .rule.fail .ic{background:var(--ng)} .rule.check .ic{background:var(--chk)}
+  .rule .txt b{font-weight:600}
+  .rule .why{color:var(--sub);font-size:12px;display:block;margin-top:1px}
+  .qbox{background:#fbf3e2;border:1px solid #ecdcb8;border-radius:11px;padding:12px;margin-top:12px}
+  .qbox .h{font-size:12px;font-weight:700;color:var(--chk);margin:0 0 6px}
+  .qbox p{margin:0;font-size:13px}
+  .src{margin-top:12px;font-size:12px}
+  .src a{color:var(--accent);text-decoration:none}
+  .src a:hover{text-decoration:underline}
+  .verified{font-size:11px;color:var(--sub);margin-top:6px}
+  .disclaimer{font-size:11.5px;color:var(--sub);background:#fff;border-radius:12px;padding:12px 14px;margin:14px 0;border:1px dashed var(--line)}
+  footer{max-width:760px;margin:22px auto 0;padding:0 18px;font-size:11px;color:var(--sub);text-align:center}
+</style>
+</head>
+<body>
+<header>
+  <h1>舞台芸術 助成金 適格性チェック</h1>
+  <p class="lede">団体・企画の情報から、応募できる助成を根拠つきで判定します。</p>
+  <span class="proto-tag">PROTOTYPE · 検証済み7制度 · 2026-07-17時点</span>
+</header>
+
+<main>
+  <!-- 入力 -->
+  <div id="form">
+    <div class="card">
+      <h2><span class="n">1</span>応募者の種別</h2>
+      <div class="seg" id="applicantKind">
+        <button data-v="organization" class="on">団体</button>
+        <button data-v="individual">個人</button>
+      </div>
+
+      <div id="orgFields">
+        <label>法人格</label>
+        <select id="legalForm">
+          <option value="voluntary_association">任意団体</option>
+          <option value="npo">NPO法人</option>
+          <option value="general_incorporated">一般社団・財団法人</option>
+          <option value="public_interest">公益社団・財団法人</option>
+          <option value="stock_company">株式会社等</option>
+        </select>
+        <label>設立年（西暦）</label>
+        <input id="foundedYear" type="number" inputmode="numeric" placeholder="例: 2021" value="2021">
+      </div>
+
+      <div id="indFields" class="hidden">
+        <label>年齢（2026年3月31日時点）</label>
+        <input id="age" type="number" inputmode="numeric" placeholder="例: 34" value="34">
+        <label>これまでに劇作・演出・振付を担当した作品数</label>
+        <input id="worksCreated" type="number" inputmode="numeric" placeholder="例: 5" value="5">
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">2</span>拠点と分野</h2>
+      <div class="row">
+        <div>
+          <label>活動の本拠地（都道府県）</label>
+          <select id="prefecture">
+            <option>東京都</option><option>三重県</option><option>大阪府</option>
+            <option>愛知県</option><option>その他</option>
+          </select>
+        </div>
+        <div>
+          <label>市区町村（東京の区助成用）</label>
+          <select id="city">
+            <option value="">—</option><option>杉並区</option><option>港区</option><option>その他</option>
+          </select>
+        </div>
+      </div>
+      <label>分野（複数選択可）</label>
+      <div class="chips" id="genres">
+        <button data-v="演劇" class="on">演劇</button>
+        <button data-v="現代舞踊" class="on">現代舞踊</button>
+        <button data-v="サーカス">サーカス/フィジカル</button>
+        <button data-v="音楽">音楽</button>
+        <button data-v="その他">その他</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">3</span>実績</h2>
+      <label>過去3年（2022/11〜2025/11）の国内・主催・有料公演の回数</label>
+      <input id="paidPerfs3yr" type="number" inputmode="numeric" placeholder="例: 2" value="2">
+      <label>継続的な活動年数</label>
+      <input id="yearsActive" type="number" inputmode="numeric" placeholder="例: 4" value="4">
+      <div class="row">
+        <div>
+          <label>本拠地（区）での公開事業の主催回数（過去3年）</label>
+          <input id="wardPerfs" type="number" inputmode="numeric" value="0">
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2><span class="n">4</span>今回の企画</h2>
+      <label>活動の種類</label>
+      <select id="activityType">
+        <option value="self_produced_performance">自主企画の公演（有料・公開）</option>
+        <option value="commissioned">依頼公演・買取公演</option>
+        <option value="international">国際共同制作・海外公演</option>
+        <option value="workshop_only">ワークショップのみ</option>
+      </select>
+      <div class="row">
+        <div>
+          <label>公演の実施地（都道府県）</label>
+          <select id="venuePref"><option>東京都</option><option>三重県</option><option>大阪府</option><option>その他</option></select>
+        </div>
+        <div>
+          <label>総事業費（円）</label>
+          <input id="totalBudget" type="number" inputmode="numeric" value="4500000">
+        </div>
+      </div>
+      <label>同一事業で文化庁・文部科学省の補助金を受ける予定がある</label>
+      <div class="seg" id="doubleFunding">
+        <button data-v="no" class="on">いいえ</button>
+        <button data-v="yes">はい</button>
+      </div>
+    </div>
+
+    <button class="cta" onclick="run()">適格性を判定する</button>
+    <p class="disclaimer">これは検証用プロトタイプです。判定は募集要項の明示条件のみに基づく機械的なもので、採択可能性を示すものではありません。最終判断は必ず各助成元の最新の募集要項でご確認ください。</p>
+  </div>
+
+  <!-- 結果 -->
+  <div id="results" class="hidden"></div>
+</main>
+
+<footer>データは2026-07-17に各公式サイト・募集要項PDFで一次確認したもの（全39判定単位中の代表7制度）。締切等は変動します。</footer>
+
+<script>
+/* ---------- プロフィール収集 ---------- */
+const state = { applicantKind:'organization', genres:['演劇','現代舞踊'], doubleFunding:'no' };
+function seg(id,key){document.querySelectorAll('#'+id+' button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('#'+id+' button').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on'); state[key]=b.dataset.v;
+  if(id==='applicantKind') toggleKind();
+});}
+seg('applicantKind','applicantKind'); seg('doubleFunding','doubleFunding');
+document.querySelectorAll('#genres button').forEach(b=>b.onclick=()=>{
+  b.classList.toggle('on');
+  state.genres=[...document.querySelectorAll('#genres button.on')].map(x=>x.dataset.v);
+});
+function toggleKind(){
+  const ind=state.applicantKind==='individual';
+  document.getElementById('indFields').classList.toggle('hidden',!ind);
+  document.getElementById('orgFields').classList.toggle('hidden',ind);
+}
+function readProfile(){
+  const v=id=>document.getElementById(id).value;
+  const n=id=>parseInt(v(id)||'0',10);
+  return {
+    applicantKind:state.applicantKind,
+    legalForm:v('legalForm'),
+    foundedYear:n('foundedYear'),
+    age:n('age'),
+    worksCreated:n('worksCreated'),
+    prefecture:v('prefecture'),
+    city:v('city'),
+    genres:state.genres,
+    paidPerfs3yr:n('paidPerfs3yr'),
+    yearsActive:n('yearsActive'),
+    wardPerfs:n('wardPerfs'),
+    activityType:v('activityType'),
+    venuePref:v('venuePref'),
+    totalBudget:n('totalBudget'),
+    doubleFunding:state.doubleFunding
+  };
+}
+
+/* ---------- ルール評価ヘルパー ---------- */
+const PASS=(txt)=>({result:'pass',txt});
+const FAIL=(txt,why)=>({result:'fail',txt,why});
+const CHECK=(txt,why)=>({result:'needs_check',txt,why});
+const isOrg=p=>p.applicantKind==='organization';
+const isInd=p=>p.applicantKind==='individual';
+const hasStageGenre=p=>p.genres.some(g=>['演劇','現代舞踊','サーカス'].includes(g));
+const isContemporaryTheaterDance=p=>p.genres.some(g=>['演劇','現代舞踊'].includes(g));
+
+/* ---------- 制度データ（2026-07-17 一次検証済み） ---------- */
+const PROGRAMS = [
+ {
+  id:'act_c1_kokunai', name:'東京芸術文化創造発信助成 カテゴリーI（国内活動）',
+  funder:'アーツカウンシル東京', region:'東京都',
+  deadline:'2026-08-04（第2期・受付中）', dlUrgent:true,
+  amount:'団体200万円／個人50万円（対象経費の1/2以内）',
+  payment:'原則確定払（後払い）。概算払請求可（1回限り・交付決定額の1/2上限）',
+  cashflow:'後払い＋概算払1/2',
+  src:'https://www.artscouncil-tokyo.jp/grants/tokyo-grant-program/28201/',
+  rules:[
+    p=> (p.prefecture==='東京都') ? PASS('東京都内に本拠がある') : FAIL('東京都内に本拠がある','本拠地が東京都以外（現在: '+p.prefecture+'）'),
+    p=> hasStageGenre(p) ? PASS('芸術文化の創造・発信活動') : CHECK('芸術文化の創造・発信活動','分野が対象に該当するか要確認'),
+    p=> (p.activityType==='self_produced_performance'||p.activityType==='international')
+        ? PASS('公開を伴う芸術創造活動') : CHECK('公開を伴う芸術創造活動','活動の種類が対象か要確認'),
+  ],
+  softNote:'法人格は不問。個人（都内在住）も応募可。実績要件なし。'
+ },
+ {
+  id:'act_live_stage', name:'東京ライブ・ステージ応援助成（カテゴリーI）',
+  funder:'アーツカウンシル東京', region:'東京都',
+  deadline:'第1期終了（第2期の告知待ち）', dlUrgent:false,
+  amount:'上限100万円（中小規模）／対象経費の1/2以内',
+  payment:'確定払（後払い）。この制度は概算払の規定なし',
+  cashflow:'後払いのみ（立替必須）',
+  src:'https://www.artscouncil-tokyo.jp/grants/tokyo-live-and-stage-support-grant-program/27455/',
+  rules:[
+    p=> isOrg(p) ? PASS('団体である') : FAIL('団体である','個人は対象外'),
+    p=> (p.prefecture==='東京都') ? PASS('東京を拠点に活動') : FAIL('東京を拠点に活動','本拠地が東京都以外'),
+    p=> (p.yearsActive>=5) ? PASS('5年以上の活動実績') : FAIL('5年以上の活動実績','活動年数が5年未満（現在: '+p.yearsActive+'年）'),
+  ]
+ },
+ {
+  id:'act_startup', name:'スタートアップ助成',
+  funder:'アーツカウンシル東京', region:'東京都',
+  deadline:'第1回終了（2026年度第2回の告知待ち）', dlUrgent:false,
+  amount:'団体100万円／個人30万円',
+  payment:'確定払（後払い）。概算払は団体のみ可',
+  cashflow:'後払い（概算払は団体のみ）',
+  src:'https://www.artscouncil-tokyo.jp/grants/startup-grant-program/26679/',
+  rules:[
+    p=> (p.prefecture==='東京都') ? PASS('都内に本拠／在住') : FAIL('都内に本拠／在住','本拠地が東京都以外'),
+    p=> isOrg(p)
+        ? ((2026-p.foundedYear)<3 ? PASS('設立3年未満の団体') : FAIL('設立3年未満の団体','設立から3年以上（'+p.foundedYear+'年設立）'))
+        : CHECK('初主催3年未満 or 主催公開活動5回以内','個人の初主催時期・公開活動回数を要確認'),
+  ],
+  softNote:'新進の個人・団体の立ち上げ期を支援する制度。'
+ },
+ {
+  id:'kikin_engeki', name:'芸術文化振興基金 現代舞台芸術創造普及活動',
+  funder:'日本芸術文化振興会', region:'全国',
+  deadline:'令和8年度分終了（次回は例年10月末〜11月）', dlUrgent:false,
+  amount:'定額制6区分（50〜400万円）',
+  payment:'精算払（後払い）が原則。一定要件の活動は概算払可（要件詳細は非公開）',
+  cashflow:'後払い（概算払は要件次第）',
+  src:'https://www.ntj.jac.go.jp/grant/program/applicant/01/',
+  rules:[
+    p=> isOrg(p) ? PASS('団体である') : FAIL('団体である','個人は応募不可（団体のみ）'),
+    p=> ['演劇','現代舞踊'].some(g=>p.genres.includes(g)) ? PASS('現代舞台芸術の分野') : CHECK('現代舞台芸術の分野','対象分野に該当するか要確認'),
+    p=> (p.paidPerfs3yr>=1) ? PASS('直近3年に国内主催有料公演1回以上') : FAIL('直近3年に国内主催有料公演1回以上','実績が0回'),
+    p=> (p.doubleFunding==='no') ? PASS('文科省・文化庁補助金と重複しない') : FAIL('文科省・文化庁補助金と重複しない','同一活動で文化庁等の補助金を受ける予定'),
+    p=> (p.activityType==='self_produced_performance') ? PASS('自主・公開・有料の公演') : (
+        p.activityType==='commissioned' ? FAIL('自主・公開・有料の公演','依頼・買取公演は対象外') :
+        p.activityType==='workshop_only' ? FAIL('自主・公開・有料の公演','ワークショップのみは対象外') :
+        CHECK('自主・公開・有料の公演','活動の種類を要確認')),
+  ],
+  softNote:'任意団体も応募可（規約・会計組織・事務所・設立1年以上が要件）。'
+ },
+ {
+  id:'saison_fellow1', name:'セゾン・フェローI',
+  funder:'セゾン文化財団', region:'全国',
+  deadline:'2026年度分終了（次回2027年度は例年8月1日〜）', dlUrgent:false,
+  amount:'120万円/年 × 2年継続',
+  payment:'要項に記載なし（財団に確認中）',
+  cashflow:'未確認 → 質問文を生成',
+  src:'https://www.saison.or.jp/application',
+  rules:[
+    p=> isInd(p) ? PASS('個人の芸術家') : FAIL('個人の芸術家','団体は対象外（個人のみ）'),
+    p=> isContemporaryTheaterDance(p) ? CHECK('現代演劇・舞踊の分野','分野の境界判断は財団に確認するのが安全') : FAIL('現代演劇・舞踊の分野','対象分野に該当しない'),
+    p=> (p.worksCreated>=3) ? PASS('3作品以上の劇作・演出・振付') : FAIL('3作品以上の劇作・演出・振付','作品数が3未満（現在: '+p.worksCreated+'）'),
+    p=> (p.age>0 && p.age<=40) ? PASS('2026/3/31時点で40歳以下') : FAIL('2026/3/31時点で40歳以下','40歳超（現在: '+p.age+'歳）'),
+  ],
+  genForFunder:'セゾン・フェローI・II、サバティカル等の支払時期（前払い/概算払い/精算払い、報告から入金までの目安）を確認したい。→ inquiry_saison_payment を参照'
+ },
+ {
+  id:'saison_flight', name:'セゾン フライト・グラント',
+  funder:'セゾン文化財団', region:'全国',
+  deadline:'2026年度分終了（例年1〜3月）', dlUrgent:false,
+  amount:'地域別12〜35万円（渡航費実費上限）',
+  payment:'原則後払い（渡航前請求は応相談）',
+  cashflow:'後払い（相談で渡航前も可）',
+  src:'https://www.saison.or.jp/application',
+  rules:[
+    p=> isInd(p) ? PASS('個人である') : FAIL('個人である','団体は対象外（個人のみ）'),
+    p=> isContemporaryTheaterDance(p) ? PASS('現代演劇・舞踊分野') : CHECK('現代演劇・舞踊分野','対象分野か要確認'),
+    p=> CHECK('海外からの招聘による渡航','招聘の有無（招待状等）と渡航目的を要確認'),
+  ]
+ },
+ {
+  id:'suginami_wakate', name:'杉並区 若手アーティスト文化芸術活動事業助成金',
+  funder:'杉並区', region:'東京都杉並区',
+  deadline:'令和8年度分終了（次回は例年4月）', dlUrgent:false,
+  amount:'上限20万円・補助率10/10',
+  payment:'精算払（後払い）。報告後おおむね1か月で振込',
+  cashflow:'後払い（前払いなし）',
+  src:'https://www.city.suginami.tokyo.jp/s030/news/25128.html',
+  rules:[
+    p=> (p.city==='杉並区') ? PASS('杉並区に住民登録／区内本部') : FAIL('杉並区に住民登録／区内本部','本拠地が杉並区でない'),
+    p=> isInd(p)
+        ? ((p.age>0 && p.age<=39) ? PASS('満39歳以下（個人）') : CHECK('満39歳以下（個人）','育児・療養等の中断があれば44歳以下まで可。要確認'))
+        : CHECK('団体要件（代表39歳以下等）','代表者年齢・構成員構成を要確認'),
+    p=> (p.venuePref==='東京都') ? PASS('区内で一般公開する事業') : CHECK('区内で一般公開する事業','杉並区内での開催か要確認'),
+  ],
+  softNote:'個人は活動実績不要。オンラインのみの事業は対象外。'
+ },
+];
+
+/* ---------- 判定 ---------- */
+function assess(program,p){
+  const results = program.rules.map(fn=>fn(p));
+  let verdict;
+  if(results.some(r=>r.result==='fail')) verdict='ineligible';
+  else if(results.some(r=>r.result==='needs_check')) verdict='needs_check';
+  else verdict='eligible';
+  return {results,verdict};
+}
+const V = {
+  eligible:{cls:'ok',label:'条件適合',pill:'ok'},
+  needs_check:{cls:'chk',label:'要確認',pill:'chk'},
+  ineligible:{cls:'ng',label:'対象外',pill:'ng'}
+};
+const RICON={pass:'✓',fail:'×',needs_check:'?'};
+const RCLS={pass:'pass',fail:'fail',needs_check:'check'};
+
+function run(){
+  const p=readProfile();
+  const assessed=PROGRAMS.map(pr=>({pr,...assess(pr,p)}));
+  const order={eligible:0,needs_check:1,ineligible:2};
+  assessed.sort((a,b)=>order[a.verdict]-order[b.verdict]);
+  const c={eligible:0,needs_check:0,ineligible:0};
+  assessed.forEach(a=>c[a.verdict]++);
+
+  let html=`<div class="card">
+    <h2><span class="n">✓</span>判定結果（${PROGRAMS.length}制度）</h2>
+    <div class="summary">
+      <span class="pill ok">条件適合 ${c.eligible}</span>
+      <span class="pill chk">要確認 ${c.needs_check}</span>
+      <span class="pill ng">対象外 ${c.ineligible}</span>
+    </div>
+    <p class="hint">「対象外」も、なぜ外れるかを根拠つきで即答できるのがこのツールの価値です。締切・支給時期も各カードで確認できます。</p>`;
+
+  assessed.forEach((a,i)=>{
+    const v=V[a.verdict];
+    html+=`<div class="res">
+      <div class="res-head" onclick="this.parentNode.querySelector('.res-body').classList.toggle('hidden')">
+        <div>
+          <p class="res-title">${a.pr.name}</p>
+          <p class="res-funder">${a.pr.funder} ・ ${a.pr.region}</p>
+        </div>
+        <span class="verdict ${v.cls}">${v.label}</span>
+      </div>
+      <div class="res-body${i>0&&a.verdict==='ineligible'?' hidden':''}">
+        <div class="meta">
+          <span class="tag ${a.pr.dlUrgent?'dl':''}">締切: ${a.pr.deadline}</span>
+          <span class="tag">助成額: ${a.pr.amount}</span>
+          <span class="tag cash">💰 ${a.pr.cashflow}</span>
+        </div>`;
+    a.results.forEach(r=>{
+      html+=`<div class="rule ${RCLS[r.result]}">
+        <span class="ic">${RICON[r.result]}</span>
+        <span class="txt"><b>${r.txt}</b>${r.why?`<span class="why">${r.why}</span>`:''}</span>
+      </div>`;
+    });
+    if(a.pr.softNote) html+=`<p class="hint" style="margin-top:10px">ℹ️ ${a.pr.softNote}</p>`;
+    // 支給時期が未確認 → 質問文を提示
+    if(a.pr.cashflow.includes('未確認') && a.pr.genForFunder){
+      html+=`<div class="qbox"><p class="h">🗒️ 助成元への確認事項（自動生成）</p><p>${a.pr.genForFunder}</p></div>`;
+    }
+    html+=`<div class="src">📄 出典: <a href="${a.pr.src}" target="_blank" rel="noopener">${a.pr.funder} 公式ページ</a></div>
+      <p class="verified">最終確認: 2026-07-17（募集要項PDFで一次確認）</p>
+    </div></div>`;
+  });
+  html+=`<button class="cta" onclick="back()" style="background:#8a8d9a">条件を修正する</button></div>`;
+
+  document.getElementById('form').classList.add('hidden');
+  const res=document.getElementById('results');
+  res.innerHTML=html; res.classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function back(){
+  document.getElementById('results').classList.add('hidden');
+  document.getElementById('form').classList.remove('hidden');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+</script>
+</body>
+</html>
