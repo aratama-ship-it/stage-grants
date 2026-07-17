@@ -33,9 +33,12 @@ const BUCKETS = [
 const GENRES = [
   { key: 'butai', tag: '舞台', label: '舞台芸術（演劇・舞踊・サーカス）', hero: '演劇・舞踊・ダンス・サーカス' },
   { key: 'ongaku', tag: '音楽', label: '音楽', hero: 'クラシック・現代音楽・邦楽・オペラ・合唱・吹奏楽' },
+  { key: 'bijutsu', tag: '美術', label: '美術・現代アート', hero: '絵画・彫刻・現代アート・メディアアート・写真・工芸・展覧会' },
+  { key: 'eizo', tag: '映像', label: '映像・映画', hero: '映画・ドキュメンタリー・アニメーション・実験映像・メディア芸術' },
+  { key: 'bungei', tag: '文芸・伝統芸能', label: '文芸・伝統芸能ほか', hero: '文芸・出版・伝統芸能・工芸・地域文化' },
 ];
 const genresOf = (p) => (Array.isArray(p.genres) && p.genres.length ? p.genres : ['舞台']);
-const COMING = ['美術・現代アート', '映像・映画', '文芸・伝統芸能ほか'];
+const COMING = [];
 const openPrograms = programs.filter((p) => p.dlUrgent);
 
 // ---- 共通レイアウト ----
