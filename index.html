@@ -197,7 +197,7 @@
   <div id="results" class="hidden"></div>
 </main>
 
-<footer>データは2026-07-17に各公式サイト・募集要項PDFで一次確認したもの（全国＋東京の検証済み助成／39判定単位を制度単位で集約）。締切等は変動します。</footer>
+<footer>データは2026-07-17に各公式サイト・募集要項PDFで一次確認したもの（全国＋東京の検証済み助成を順次拡充中）。締切等は変動します。</footer>
 
 <script>
 /* ---------- プロフィール収集 ---------- */
@@ -703,6 +703,127 @@ const PROGRAMS = [
     p=> isInd(p) ? PASS('個人である') : FAIL('個人である','団体は対象外（個人のみ）'),
     p=> isContemporaryTheaterDance(p) ? PASS('現代演劇・舞踊分野') : CHECK('現代演劇・舞踊分野','対象分野か要確認'),
     p=> CHECK('海外からの招聘による渡航','招聘の有無（招待状等）と渡航目的を要確認'),
+  ]
+ },
+ /* ===== 全国の民間財団 ===== */
+ {
+  id:'nomura', name:'野村財団 芸術・文化助成（音楽部門）',
+  funder:'野村財団', region:'全国',
+  deadline:'年2回（上期4月末／下期10月末頃）', dlUrgent:false,
+  amount:'上限100万円',
+  payment:'要項に記載なし（要確認）',
+  cashflow:'未確認 → 要問い合わせ',
+  src:'https://www.nomurafoundation.or.jp/culture/',
+  rules:[
+    p=> PASS('個人・団体・2名以上のグループが応募可（法人格不問）'),
+    p=> p.genres.some(g=>['現代舞踊','音楽'].includes(g)) ? CHECK('バレエ・オペラ・音楽が対象','舞踊はバレエ中心。現代舞踊・演劇・サーカスが対象か要確認') : FAIL('バレエ・オペラ・音楽が対象','演劇・サーカス等は対象外'),
+    p=> CHECK('若手育成 or 国際交流が目的の活動','一般の公演制作費ではなく育成・国際交流枠。目的を要確認'),
+  ]
+ },
+ {
+  id:'asahi', name:'朝日新聞文化財団 芸術活動助成金',
+  funder:'朝日新聞文化財団', region:'全国',
+  deadline:'2026-10-25（受付中・2027年度実施分）', dlUrgent:true,
+  amount:'上限100万円',
+  payment:'後払い（精算方式）。申請者名義の国内口座に振込',
+  cashflow:'後払い（前払いなし）',
+  src:'https://www.asahizaidan.or.jp/grant/grant01.html',
+  rules:[
+    p=> (p.legalForm==='stock_company') ? FAIL('非営利であること','企業・営利団体は対象外') : PASS('個人・非営利/任意団体が応募可'),
+    p=> CHECK('バレエ・音楽・伝統芸能等が対象','対象はバレエ・オペラ・邦楽・能・文楽等。現代の演劇・現代舞踊が対象か要確認'),
+    p=> CHECK('プロ（を目指す）芸術家が出演する事業','自己負担金のない事業・賞金付きコンクール等は対象外'),
+  ]
+ },
+ {
+  id:'asahigroup', name:'アサヒグループ財団 芸術文化助成',
+  funder:'アサヒグループ財団', region:'全国',
+  deadline:'現在【募集休止中】（再開時期未定）', dlUrgent:false,
+  amount:'休止中（過去は演劇・舞踊等の公演を対象）',
+  payment:'未確認',
+  cashflow:'未確認',
+  src:'https://www.bunka.go.jp/seisaku/geijutsubunka/mecenat/shien/zaidan/1420925.html',
+  rules:[
+    p=> CHECK('現在は募集休止中','演劇・舞踊も対象だったジャンル最適合の助成。再開時に条件を要確認'),
+  ]
+ },
+ /* ===== 全国の公的制度（拡充分） ===== */
+ {
+  id:'gekijo_kyodo', name:'劇場・音楽堂等機能強化推進事業（共同制作支援事業）',
+  funder:'文化庁／日本芸術文化振興会', region:'全国',
+  deadline:'令和8年度分終了（次回は例年11月頃）', dlUrgent:false,
+  amount:'助成率1/2以内（バリアフリー・多言語対応は別枠250万）',
+  payment:'未確認（JAC助成は精算払いが基本と推定）',
+  cashflow:'後払い（推定）',
+  src:'https://gekijo-ongakudo.ntj.jac.go.jp/',
+  rules:[
+    p=> isOrg(p) ? PASS('実演芸術団体が代表申請者になれる') : FAIL('実演芸術団体が代表申請者になれる','個人は対象外'),
+    p=> CHECK('複数の劇場・音楽堂等との共同制作が前提','劇場と組む新作公演が対象。共同制作の体制を要確認'),
+  ]
+ },
+ {
+  id:'renkei_kiban', name:'劇場・音楽堂等と芸術団体の連携による地域活動基盤形成支援事業',
+  funder:'文化庁／日本芸術文化振興会（運営VIPO）', region:'東京以外の46道府県',
+  deadline:'令和8年度分終了（3/2締切）', dlUrgent:false,
+  amount:'上限8,000万円（収支差額を助成）',
+  payment:'精算払（後払い・推定）',
+  cashflow:'後払い（推定）',
+  src:'https://www.ntj.jac.go.jp/grant/topics/2025/20251226001/',
+  rules:[
+    p=> hasCorp(p) ? PASS('法人格を有する創造団体／統括団体') : FAIL('法人格を有する団体','任意団体・個人は対象外'),
+    p=> (p.prefecture==='東京都') ? FAIL('対象地域は東京都以外の46道府県','東京都拠点は対象外') : PASS('対象地域（東京都以外）'),
+    p=> CHECK('過去のJAC「公演創造活動」採択実績が必須','令和5〜7年度の採択実績が要件。無実績団体は不可'),
+  ]
+ },
+ {
+  id:'air_kyodo', name:'アーティスト・イン・レジデンス型地域協働支援事業',
+  funder:'文化庁', region:'全国',
+  deadline:'例年1月頃', dlUrgent:false,
+  amount:'上限400万円',
+  payment:'未確認',
+  cashflow:'未確認',
+  src:'https://www.bunka.go.jp/shinsei_boshu/kobo/index.html',
+  rules:[
+    p=> isOrg(p) ? PASS('法人・専門家団体が申請可') : CHECK('申請主体','自治体・法人・専門家団体が対象。個人単独は要確認'),
+    p=> CHECK('海外AIR団体と協働する滞在制作','外国人アーティスト招へいの滞在制作が対象。事業内容を要確認'),
+  ]
+ },
+ {
+  id:'shinshin_kaigai', name:'文化庁 新進芸術家海外研修制度',
+  funder:'文化庁', region:'全国／海外',
+  deadline:'例年8月頃', dlUrgent:false,
+  amount:'渡航費・支度料・滞在費を支援（研修期間別）',
+  payment:'未確認',
+  cashflow:'未確認',
+  src:'https://www.zaikenbunka.go.jp/',
+  rules:[
+    p=> isInd(p) ? PASS('個人（新進芸術家・技術者・制作者）') : FAIL('個人が対象','団体は対象外（個人のみ）'),
+    p=> hasStageGenre(p) ? PASS('舞踊・演劇・舞台美術等が対象') : CHECK('対象分野','舞台美術・演出等も含む。分野を要確認'),
+    p=> CHECK('海外研修＋活動実績・語学力・受入保証','研修計画・語学力・受入先を要確認'),
+  ]
+ },
+ {
+  id:'eujapan_mobility', name:'EU・ジャパンフェスト Mobility Support Program',
+  funder:'EU・ジャパンフェスト日本委員会', region:'全国／日欧',
+  deadline:'後期は2026-08-01〜（旅行日の6週間前まで）', dlUrgent:true,
+  amount:'上限15万円（日欧間・初回）／10万円（2回目〜）',
+  payment:'訪日時は現金支給／欧州等は銀行振込（実質後払い）',
+  cashflow:'後払い（実質）',
+  src:'https://www.eu-japanfest.org/en/support/apply-mobility-support-program2026/',
+  rules:[
+    p=> PASS('個人・小団体が応募可（1件最大2名）'),
+    p=> CHECK('日欧の文化交流プロジェクトの渡航・移動','リサーチ・企画・協働のための移動支援に限定。日欧プロジェクトが前提'),
+  ]
+ },
+ {
+  id:'jafra', name:'地域創造（JAFRA）各種助成',
+  funder:'一般財団法人 地域創造', region:'全国（公立文化施設向け）',
+  deadline:'例年9月頃（事業により異なる）', dlUrgent:false,
+  amount:'事業により異なる',
+  payment:'未確認',
+  cashflow:'未確認',
+  src:'https://www.jafra.or.jp/project/grant/01.html',
+  rules:[
+    p=> FAIL('申請主体は自治体・公立文化施設等','劇団・カンパニー・個人は直接申請不可（公立ホール・自治体経由）'),
   ]
  },
 ];
