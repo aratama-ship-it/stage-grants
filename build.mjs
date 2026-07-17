@@ -26,6 +26,13 @@ const BUCKETS = [
   { key: 'osaka', label: '大阪・関西' },
   { key: 'nagoya', label: '名古屋・愛知' },
 ];
+// ---- ジャンル ----
+const GENRES = [
+  { key: 'butai', tag: '舞台', label: '舞台芸術（演劇・舞踊・サーカス）', hero: '演劇・舞踊・ダンス・サーカス' },
+  { key: 'ongaku', tag: '音楽', label: '音楽', hero: 'クラシック・現代音楽・邦楽・オペラ・合唱・吹奏楽' },
+];
+const genresOf = (p) => (Array.isArray(p.genres) && p.genres.length ? p.genres : ['舞台']);
+const COMING = ['美術・現代アート', '映像・映画', '文芸・伝統芸能ほか'];
 const openPrograms = programs.filter((p) => p.dlUrgent);
 
 // ---- 共通レイアウト ----
@@ -137,12 +144,12 @@ function write(rel, html) {
     return `<a class="tile" href="regions/${b.key}.html"><b>${b.label}</b><div class="c">${n}制度</div></a>`;
   }).join('');
   const genreTiles = [
-    ['舞台芸術（演劇・舞踊・サーカス）', `${programs.length}制度・公開中`, 'genres/butai.html'],
-    ['音楽', '近日追加', ''], ['美術・現代アート', '近日追加', ''],
-    ['映像・映画', '近日追加', ''], ['文芸・伝統芸能ほか', '近日追加', ''],
-  ].map(([n, c, href]) => href
-    ? `<a class="tile" href="${href}"><b>${n}</b><div class="c">${c}</div></a>`
-    : `<div class="tile" style="opacity:.55"><b>${n}</b><div class="c">${c}</div></div>`).join('');
+    ...GENRES.map((g) => {
+      const n = programs.filter((p) => genresOf(p).includes(g.tag)).length;
+      return `<a class="tile" href="genres/${g.key}.html"><b>${g.label}</b><div class="c">${n}制度・公開中</div></a>`;
+    }),
+    ...COMING.map((n) => `<div class="tile" style="opacity:.55"><b>${n}</b><div class="c">近日追加</div></div>`),
+  ].join('');
   const body = `
 <h1>あなたに合う文化芸術の助成金を、根拠つきで。</h1>
 <p class="lede">締切・助成額・「いつ入金されるか（支給時期）」・応募条件をまとめて確認。まずは舞台芸術から、全国＋東京・大阪・名古屋の${programs.length}制度を収録（無料）。</p>
@@ -206,18 +213,29 @@ ${list.map((p) => gitem(p, '../')).join('')}
   write(`regions/${b.key}.html`, layout({ title: `${b.label}の文化芸術 助成金一覧｜${SITE_NAME}`, desc: `${b.label}で応募できる文化芸術・舞台芸術の助成金${list.length}制度。締切・助成額・支給時期つき。`, rel: '../', active: 'grants', body }));
 }
 
-// ---- ジャンル: 舞台芸術 ----
-{
-  const body = `<h1>舞台芸術（演劇・舞踊・サーカス）の助成金（${programs.length}制度）</h1>
-<p class="lede">舞台芸術の制作者・団体・フリー制作者が応募できる助成金を、全国＋東京・大阪・名古屋で網羅。音楽・美術・映像などのジャンルは順次追加します。</p>
-${programs.map((p) => gitem(p, '../')).join('')}`;
-  write('genres/butai.html', layout({ title: `舞台芸術の助成金一覧（${programs.length}制度）｜${SITE_NAME}`, desc: `演劇・舞踊・ダンス・サーカスの助成金${programs.length}制度。締切・助成額・支給時期・応募条件つき。`, rel: '../', active: 'grants', body }));
+// ---- ジャンル別ページ ----
+for (const g of GENRES) {
+  const list = programs.filter((p) => genresOf(p).includes(g.tag));
+  if (!list.length) continue;
+  const open = list.filter((p) => p.dlUrgent);
+  const otherGenres = GENRES.filter((x) => x.key !== g.key).map((x) => `<a href="${x.key}.html">${x.label}</a>`).join(' ・ ');
+  const body = `<h1>${g.label}の助成金（${list.length}制度）</h1>
+<p class="lede">${g.hero}の制作者・団体・フリー制作者が応募できる助成金を、全国＋東京・大阪・名古屋で掲載。締切・助成額・支給時期・応募条件つき。</p>
+<p class="note">ほかのジャンル: ${otherGenres}（美術・映像などは順次追加）</p>
+${open.length ? `<h2>いま受付中（${open.length}）</h2>${open.map((p) => gitem(p, '../')).join('')}` : ''}
+<h2>制度一覧</h2>
+${list.map((p) => gitem(p, '../')).join('')}`;
+  write(`genres/${g.key}.html`, layout({ title: `${g.label}の助成金一覧（${list.length}制度）｜${SITE_NAME}`, desc: `${g.hero}の助成金${list.length}制度。締切・助成額・支給時期・応募条件つき。`, rel: '../', active: 'grants', body }));
 }
 
 // ---- 制度別ページ ----
 for (const p of programs) {
   const related = programs.filter((q) => q.funder === p.funder && q.id !== p.id).slice(0, 5);
-  const body = `<p class="note"><a href="../grants.html">助成金一覧</a> ／ <a href="../regions/${bucketOf(p.region).key}.html">${esc(bucketOf(p.region).label)}</a></p>
+  const genreLinks = genresOf(p).map((tag) => {
+    const g = GENRES.find((x) => x.tag === tag);
+    return g ? `<a href="../genres/${g.key}.html">${g.label}</a>` : esc(tag);
+  }).join(' ・ ');
+  const body = `<p class="note"><a href="../grants.html">助成金一覧</a> ／ <a href="../regions/${bucketOf(p.region).key}.html">${esc(bucketOf(p.region).label)}</a> ／ ${genreLinks}</p>
 <h1>${esc(p.name)}</h1>
 <p class="lede">${esc(p.funder)} ・ ${esc(p.region)}</p>
 <div class="tags">${statusTags(p)}</div>
@@ -280,4 +298,4 @@ write('disclaimer.html', layout({
 </div>`,
 }));
 
-console.log(`Generated: index, grants, calendar, ${BUCKETS.length} regions, 1 genre, ${programs.length} grant pages, 3 policy pages.`);
+console.log(`Generated: index, grants, calendar, ${BUCKETS.length} regions, ${GENRES.length} genres, ${programs.length} grant pages, 3 policy pages.`);
