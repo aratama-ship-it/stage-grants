@@ -133,9 +133,9 @@
           </select>
         </div>
         <div>
-          <label>市区町村（東京の区助成用）</label>
+          <label>市区町村（区・市の助成用）</label>
           <select id="city">
-            <option value="">—</option><option>杉並区</option><option>港区</option><option>その他</option>
+            <option value="">—</option><option>杉並区</option><option>港区</option><option>大阪市</option><option>名古屋市</option><option>その他</option>
           </select>
         </div>
       </div>
@@ -824,6 +824,105 @@ const PROGRAMS = [
   src:'https://www.jafra.or.jp/project/grant/01.html',
   rules:[
     p=> FAIL('申請主体は自治体・公立文化施設等','劇団・カンパニー・個人は直接申請不可（公立ホール・自治体経由）'),
+  ]
+ },
+ /* ===== 大阪・関西 ===== */
+ {
+  id:'osaka_city', name:'大阪市芸術活動振興事業助成金',
+  funder:'大阪市（審査: 大阪アーツカウンシル）', region:'大阪府大阪市',
+  deadline:'2026-07-20（令和8年度下期・受付中）', dlUrgent:true,
+  amount:'A:20万／B:50万／特別:400万（補助率1/2）',
+  payment:'要項に記載なし（実績報告あり＝後払いと推定）',
+  cashflow:'後払い（推定）',
+  src:'https://www.city.osaka.lg.jp/keizaisenryaku/page/0000180795.html',
+  rules:[
+    p=> (p.city==='大阪市') ? PASS('大阪市内で芸術活動を行う') : ((p.prefecture==='大阪府') ? CHECK('大阪市内で芸術活動を行う','大阪府内。大阪市内での実施か要確認') : FAIL('大阪市内で芸術活動を行う','大阪市内での活動が対象')),
+    p=> PASS('個人・団体いずれも応募可'),
+    p=> hasStageGenre(p) ? PASS('芸術活動（舞台芸術を含む）') : CHECK('芸術活動','対象分野に該当するか要確認'),
+  ]
+ },
+ {
+  id:'osaka_pref', name:'大阪府芸術文化振興補助金',
+  funder:'大阪府（審査: 大阪アーツカウンシル）', region:'大阪府',
+  deadline:'令和8年度分終了（次回は例年12月頃）', dlUrgent:false,
+  amount:'上限100万円・補助率1/2以内',
+  payment:'未確認（後払いと推定）',
+  cashflow:'未確認',
+  src:'https://www.pref.osaka.lg.jp/o070100/bunka/news/geibunhojo.html',
+  rules:[
+    p=> (p.prefecture==='大阪府') ? PASS('大阪府内の団体') : FAIL('大阪府内の団体','大阪府外は対象外'),
+    p=> isOrg(p) ? PASS('団体である') : FAIL('団体である','個人は対象外（団体のみ）'),
+    p=> CHECK('子ども・青少年中心の鑑賞機会提供事業','次世代育成を主目的とする鑑賞機会提供事業が対象か要確認'),
+  ]
+ },
+ {
+  id:'osaka_kids', name:'輝け！子どもパフォーマー事業補助金',
+  funder:'大阪府', region:'大阪府',
+  deadline:'令和8年度分終了（次回は例年12月頃）', dlUrgent:false,
+  amount:'上限30万円',
+  payment:'未確認',
+  cashflow:'未確認',
+  src:'https://www.pref.osaka.lg.jp/o070100/bunka/news/kodomo_p.html',
+  rules:[
+    p=> (p.prefecture==='大阪府') ? PASS('大阪府内の団体・個人') : FAIL('大阪府内の団体・個人','大阪府外は対象外'),
+    p=> CHECK('子ども・青少年（約6〜20歳）が参加・発表する事業','子どもの参加・発表が必須。一般の劇団公演は対象外の可能性'),
+  ]
+ },
+ {
+  id:'arts_kansai', name:'アーツサポート関西 公募助成',
+  funder:'関西・大阪21世紀協会', region:'関西2府4県',
+  deadline:'2026年度分終了（次回は例年12月頃）', dlUrgent:false,
+  amount:'区分別の総額配分（B申請=総額300万を配分 等）',
+  payment:'未確認',
+  cashflow:'未確認',
+  src:'https://artssupport-kansai.or.jp/grant_guidelines.html',
+  rules:[
+    p=> (p.prefecture==='大阪府') ? PASS('関西2府4県が拠点') : (p.prefecture==='その他' ? CHECK('関西2府4県が拠点','滋賀/京都/大阪/兵庫/奈良/和歌山が拠点か要確認') : FAIL('関西2府4県が拠点','拠点が関西2府4県でない')),
+    p=> PASS('個人・団体いずれも応募可（区分による）'),
+    p=> hasStageGenre(p) ? PASS('舞台芸術が対象') : CHECK('対象分野','美術/音楽(クラシック除く)/舞台芸術/伝統芸能が対象'),
+  ]
+ },
+ /* ===== 名古屋・愛知 ===== */
+ {
+  id:'cln_shakai', name:'クリエイティブ・リンク・ナゴヤ 社会連携活動助成（A／B）',
+  funder:'クリエイティブ・リンク・ナゴヤ（名古屋市）', region:'愛知県名古屋市',
+  deadline:'2026年度分終了（次回は例年5月頃）', dlUrgent:false,
+  amount:'A:上限100万（率10/10）／B:上限200万（率2/3）',
+  payment:'原則精算払（後払い）。前払い可（1回・決定額の1/2まで）',
+  cashflow:'後払い＋前払い1/2可',
+  src:'https://creative-link-nagoya.jp/grant/',
+  rules:[
+    p=> (p.city==='名古屋市') ? PASS('名古屋市内で実施') : ((p.prefecture==='愛知県') ? CHECK('名古屋市内で実施','愛知県内。名古屋市在住/在勤/市内活動か要確認') : FAIL('名古屋市内で実施','名古屋市内在住/在勤/活動拠点が要件')),
+    p=> PASS('個人・団体いずれも応募可（法人格不問・18歳以上）'),
+    p=> CHECK('他分野との社会連携がテーマ','観光・まちづくり・福祉・教育・産業等との連携事業が対象。純粋な自主公演単体は趣旨外の可能性'),
+  ]
+ },
+ {
+  id:'cln_career', name:'クリエイティブ・リンク・ナゴヤ キャリアアップ支援助成',
+  funder:'クリエイティブ・リンク・ナゴヤ（名古屋市）', region:'愛知県名古屋市',
+  deadline:'2026年度分終了（次回は例年5月頃）', dlUrgent:false,
+  amount:'上限30万円・率10/10',
+  payment:'精算払（後払い）のみ。前払いなし',
+  cashflow:'後払い（立替必須）',
+  src:'https://creative-link-nagoya.jp/grant/',
+  rules:[
+    p=> (p.city==='名古屋市') ? PASS('名古屋市内在住/在勤/活動拠点') : ((p.prefecture==='愛知県') ? CHECK('名古屋市内在住/在勤/活動拠点','愛知県内。名古屋市の居住/活動要件を要確認') : FAIL('名古屋市内在住/在勤/活動拠点','名古屋市の要件を満たさない')),
+    p=> isInd(p) ? ((p.age>0&&p.age<=39)?PASS('18〜39歳'):FAIL('18〜39歳','39歳超（'+p.age+'歳）')) : CHECK('構成員全員39歳以下','団体は構成員全員が39歳以下・代表18歳以上か要確認'),
+    p=> CHECK('ポートフォリオ制作費が対象（公演制作費は不可）','記録集・作品集・映像・音源・WEB等の制作費限定。自主公演の制作費には使えない'),
+  ]
+ },
+ {
+  id:'aichi_pref', name:'愛知県文化活動事業費補助金',
+  funder:'愛知県', region:'愛知県',
+  deadline:'2026年度分終了（次回は例年春頃）', dlUrgent:false,
+  amount:'企画提案 上限100万（率1/3・新規1/2）／定額20万／後継者育成 上限100万',
+  payment:'精算払（後払い）。概算払の可否は未確認',
+  cashflow:'後払い（概算払は未確認）',
+  src:'https://www.pref.aichi.jp/soshiki/bunka/0000042974.html',
+  rules:[
+    p=> (p.prefecture==='愛知県') ? PASS('愛知県内に活動本拠') : FAIL('愛知県内に活動本拠','愛知県外は対象外'),
+    p=> isOrg(p) ? PASS('団体である') : FAIL('団体である','個人は対象外（団体のみ）'),
+    p=> (p.yearsActive>=1) ? PASS('1年以上の継続活動実績') : CHECK('1年以上の継続活動実績','補助年度4/1時点で満1年以上の活動実績が必要'),
   ]
  },
 ];
