@@ -187,7 +187,7 @@ function write(rel, html) {
   const nationalN = programs.filter((p) => bucketOf(p.region).key === 'national').length;
   const regionPane = `
 <div class="regionbar"><a class="pref" href="regions/national.html" style="font-size:14px;padding:9px 16px">全国（${nationalN}制度）</a></div>
-<p class="note" style="margin:0 0 6px">都道府県から探す（グレーは準備中。ユーザーの多い地域から順次追加します）</p>
+<p class="note" style="margin:0 0 6px">都道府県から探す（全47都道府県に対応。制度は順次拡充します。海外は準備中）</p>
 ${CHIHO.map(([label, prefs]) => `<div class="prefgroup"><div class="gh">${label}</div><div class="prefs">${prefs.map(prefChip).join('')}</div></div>`).join('')}
 <div class="prefgroup"><div class="gh">海外</div><div class="prefs"><span class="pref" title="準備中">海外（準備中）</span></div></div>`;
 
