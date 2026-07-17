@@ -43,6 +43,10 @@
   .cta:active{transform:translateY(1px)}
   .hidden{display:none}
   /* results */
+  .backbtn{display:inline-flex;align-items:center;gap:6px;background:#eef0fa;color:var(--accent);
+    border:1px solid #d7ddf6;border-radius:11px;padding:9px 15px;font-size:14px;font-weight:600;
+    cursor:pointer;font-family:inherit;margin:0 0 14px}
+  .backbtn:active{transform:translateY(1px)}
   .summary{display:flex;gap:8px;margin:6px 0 4px;flex-wrap:wrap}
   .pill{border-radius:20px;padding:4px 12px;font-size:12px;font-weight:700}
   .pill.ok{background:var(--ok-bg);color:var(--ok)}
@@ -387,6 +391,7 @@ function run(){
   assessed.forEach(a=>c[a.verdict]++);
 
   let html=`<div class="card">
+    <button class="backbtn" onclick="back()"><span aria-hidden="true">←</span> 条件を変更する</button>
     <h2><span class="n">✓</span>判定結果（${PROGRAMS.length}制度）</h2>
     <div class="summary">
       <span class="pill ok">条件適合 ${c.eligible}</span>
@@ -426,7 +431,7 @@ function run(){
       <p class="verified">最終確認: 2026-07-17（募集要項PDFで一次確認）</p>
     </div></div>`;
   });
-  html+=`<button class="cta" onclick="back()" style="background:#8a8d9a">条件を修正する</button></div>`;
+  html+=`<button class="cta" onclick="back()" style="background:#8a8d9a">← 条件を変更する</button></div>`;
 
   document.getElementById('form').classList.add('hidden');
   const res=document.getElementById('results');
