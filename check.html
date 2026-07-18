@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>舞台芸術 助成金 適格性チェック（プロトタイプ）</title>
+<title>文化芸術 助成金 適格性チェック（プロトタイプ）</title>
 <style>
   :root{
     --bg:#f2f3f7; --card:#fff; --ink:#1c1c22; --sub:#6a6d7a; --line:#e4e5ec;
@@ -98,9 +98,9 @@
   </div>
 </div>
 <header>
-  <h1>舞台芸術 助成金 適格性チェック</h1>
-  <p class="lede">団体・企画の情報から、応募できる助成を根拠つきで判定します。</p>
-  <span class="proto-tag">PROTOTYPE · 全国＋東京の検証済み助成 · 2026-07-17時点</span>
+  <h1>文化芸術 助成金 適格性チェック</h1>
+  <p class="lede">団体・企画の情報から、応募できる助成を根拠つきで判定します。舞台・音楽・美術・映像・文芸/伝統芸能に対応。</p>
+  <span class="proto-tag">PROTOTYPE · 全国＋東京・大阪・愛知等の検証済み助成66件 · 2026-07-18時点</span>
 </header>
 
 <main>
@@ -157,8 +157,12 @@
         <button data-v="現代舞踊" class="on">現代舞踊</button>
         <button data-v="サーカス">サーカス/フィジカル</button>
         <button data-v="音楽">音楽</button>
+        <button data-v="美術">美術</button>
+        <button data-v="映像">映像</button>
+        <button data-v="文芸・伝統芸能">文芸・伝統芸能</button>
         <button data-v="その他">その他</button>
       </div>
+      <p class="hint">美術・映像・文芸・伝統芸能を選ぶと、それぞれの専用助成も判定対象に加わります。</p>
     </div>
 
     <div class="card">
@@ -259,6 +263,11 @@ const isOrg=p=>p.applicantKind==='organization';
 const isInd=p=>p.applicantKind==='individual';
 const hasStageGenre=p=>p.genres.some(g=>['演劇','現代舞踊','サーカス'].includes(g));
 const isContemporaryTheaterDance=p=>p.genres.some(g=>['演劇','現代舞踊'].includes(g));
+const hasMusicGenre=p=>p.genres.includes('音楽');
+const hasVisualArtGenre=p=>p.genres.includes('美術');
+const hasFilmGenre=p=>p.genres.includes('映像');
+const hasLiteraryTraditionalGenre=p=>p.genres.includes('文芸・伝統芸能');
+const hasAnyGenre=p=>p.genres.length>0;
 const hasCorp=p=>isOrg(p)&&p.legalForm!=='voluntary_association';
 const isIntl=p=>p.activityType==='international';
 
@@ -275,7 +284,7 @@ const PROGRAMS = [
   src:'https://www.artscouncil-tokyo.jp/grants/tokyo-grant-program/28201/',
   rules:[
     p=> (p.prefecture==='東京都') ? PASS('東京都内に本拠がある') : FAIL('東京都内に本拠がある','本拠地が東京都以外（現在: '+p.prefecture+'）'),
-    p=> hasStageGenre(p) ? PASS('芸術文化の創造・発信活動') : CHECK('芸術文化の創造・発信活動','分野が対象に該当するか要確認'),
+    p=> hasAnyGenre(p) ? PASS('芸術文化の創造・発信活動（ジャンル不問）') : CHECK('芸術文化の創造・発信活動','分野が対象に該当するか要確認'),
     p=> (p.activityType==='self_produced_performance'||p.activityType==='international') ? PASS('公開を伴う芸術創造活動') : CHECK('公開を伴う芸術創造活動','活動の種類が対象か要確認'),
   ],
   softNote:'法人格は不問。個人（都内在住）も応募可。実績要件なし。'
@@ -291,7 +300,7 @@ const PROGRAMS = [
   rules:[
     p=> isOrg(p) ? PASS('団体である') : FAIL('団体である','個人は対象外（団体のみ）'),
     p=> (p.prefecture==='東京都') ? PASS('都内に本部がある') : FAIL('都内に本部がある','本拠地が東京都以外'),
-    p=> hasStageGenre(p) ? PASS('芸術文化の創造・発信活動') : CHECK('芸術文化の創造・発信活動','分野が対象か要確認'),
+    p=> hasAnyGenre(p) ? PASS('芸術文化の創造・発信活動（ジャンル不問）') : CHECK('芸術文化の創造・発信活動','分野が対象か要確認'),
     p=> CHECK('2〜3年の複数年計画','長期計画の内容を要確認'),
   ]
  },
@@ -809,7 +818,7 @@ const PROGRAMS = [
   src:'https://www.zaikenbunka.go.jp/',
   rules:[
     p=> isInd(p) ? PASS('個人（新進芸術家・技術者・制作者）') : FAIL('個人が対象','団体は対象外（個人のみ）'),
-    p=> hasStageGenre(p) ? PASS('舞踊・演劇・舞台美術等が対象') : CHECK('対象分野','舞台美術・演出等も含む。分野を要確認'),
+    p=> (hasStageGenre(p)||hasMusicGenre(p)||hasVisualArtGenre(p)) ? PASS('舞踊・演劇・音楽・美術等が対象') : FAIL('舞踊・演劇・音楽・美術等が対象','映像・文芸のみでは対象外'),
     p=> CHECK('海外研修＋活動実績・語学力・受入保証','研修計画・語学力・受入先を要確認'),
   ]
  },
@@ -850,7 +859,7 @@ const PROGRAMS = [
   rules:[
     p=> (p.city==='大阪市') ? PASS('大阪市内で芸術活動を行う') : ((p.prefecture==='大阪府') ? CHECK('大阪市内で芸術活動を行う','大阪府内。大阪市内での実施か要確認') : FAIL('大阪市内で芸術活動を行う','大阪市内での活動が対象')),
     p=> PASS('個人・団体いずれも応募可'),
-    p=> hasStageGenre(p) ? PASS('芸術活動（舞台芸術を含む）') : CHECK('芸術活動','対象分野に該当するか要確認'),
+    p=> hasAnyGenre(p) ? PASS('芸術活動（ジャンル不問）') : CHECK('芸術活動','対象分野に該当するか要確認'),
   ]
  },
  {
@@ -891,7 +900,7 @@ const PROGRAMS = [
   rules:[
     p=> (p.prefecture==='大阪府') ? PASS('関西2府4県が拠点') : (p.prefecture==='その他' ? CHECK('関西2府4県が拠点','滋賀/京都/大阪/兵庫/奈良/和歌山が拠点か要確認') : FAIL('関西2府4県が拠点','拠点が関西2府4県でない')),
     p=> PASS('個人・団体いずれも応募可（区分による）'),
-    p=> hasStageGenre(p) ? PASS('舞台芸術が対象') : CHECK('対象分野','美術/音楽(クラシック除く)/舞台芸術/伝統芸能が対象'),
+    p=> (hasStageGenre(p)||hasMusicGenre(p)||hasVisualArtGenre(p)||hasLiteraryTraditionalGenre(p)) ? PASS('美術・音楽・舞台芸術・伝統芸能が対象') : FAIL('美術・音楽・舞台芸術・伝統芸能が対象','映像のみでは対象外'),
   ]
  },
  /* ===== 名古屋・愛知 ===== */
@@ -1036,6 +1045,199 @@ const PROGRAMS = [
     p=> p.genres.includes('音楽') ? PASS('クラシック音楽の有料公演') : FAIL('クラシック音楽','対象外'),
   ],
   softNote:'名古屋発の宗次エンジェル基金が原資、事務は東京の日本演奏連盟。'
+ },
+ /* ===== 映像 ===== */
+ {
+  id:'eiga_seisaku', name:'日本映画製作支援事業',
+  funder:'文化庁／日本芸術文化振興会', region:'全国',
+  deadline:'令和8年度分終了（年2回・次回は令和9年度分）', dlUrgent:false,
+  amount:'劇映画 上限535〜2,140万／記録214〜1,605万／アニメ107〜2,140万',
+  payment:'精算払（後払い）。制作費は自己資金で立替が前提',
+  cashflow:'後払いのみ（立替必須）',
+  src:'https://www.bunka.go.jp/seisaku/geijutsubunka/eiga/seisaku_shien/',
+  rules:[
+    p=> hasCorp(p) ? PASS('法人格のある映画製作団体') : FAIL('法人格のある映画製作団体','個人・任意団体・製作委員会名義は対象外'),
+    p=> hasFilmGenre(p) ? PASS('劇映画・記録映画・アニメーション映画') : FAIL('劇映画・記録映画・アニメーション映画','映像以外は対象外'),
+    p=> CHECK('過去に映画を製作し一般公開した実績・著作権保有','実績・著作権保有の要件を満たすか要確認'),
+  ],
+  softNote:'テレビ用作品は対象外。バリアフリー字幕・音声ガイド費を別途上限100万×2計上可。'
+ },
+ {
+  id:'kokusai_eiga', name:'国際共同製作映画支援事業',
+  funder:'文化庁／日本芸術文化振興会', region:'全国／海外',
+  deadline:'令和8年度分あり（時期は文化庁公募参照）', dlUrgent:false,
+  amount:'補助率1/5以内・上限5,000万〜1億円',
+  payment:'未確認',
+  cashflow:'未確認',
+  src:'https://www.bunka.go.jp/shinsei_boshu/kobo/94137301.html',
+  rules:[
+    p=> hasCorp(p) ? PASS('法人格のある映画製作団体（一般公開実績あり）') : FAIL('法人格のある映画製作団体','個人・小団体は対象外'),
+    p=> hasFilmGenre(p) ? PASS('国際共同製作の劇映画・アニメーション映画') : FAIL('国際共同製作の劇映画・アニメーション映画','映像以外は対象外'),
+    p=> CHECK('補助対象経費1億円以上の大規模枠','事業規模が対象水準に達するか要確認'),
+  ],
+  softNote:'補助対象経費1億円以上・上映1時間以上の大規模枠。'
+ },
+ {
+  id:'mediaarts_creator', name:'文化庁 メディア芸術クリエイター育成支援事業',
+  funder:'文化庁（CG-ARTS）', region:'全国',
+  deadline:'令和8年度分終了（次回は令和9年度分）', dlUrgent:false,
+  amount:'創作支援 最大500万／発表支援 最大100万',
+  payment:'未確認',
+  cashflow:'未確認',
+  src:'https://creators.j-mediaarts.bunka.go.jp/',
+  rules:[
+    p=> (hasFilmGenre(p)||hasVisualArtGenre(p)) ? PASS('メディア芸術（アニメ/メディアアート/ゲーム/マンガ）') : FAIL('メディア芸術（アニメ/メディアアート/ゲーム/マンガ）','実写の劇映画・ドキュメンタリー等は対象外'),
+    p=> CHECK('活動歴要件（創作支援＝概ね40代までで5年以上or受賞歴／発表支援＝3年以上）','活動歴・受賞歴の要件を満たすか要確認'),
+  ],
+  softNote:'個人・団体いずれも応募可（法人格不要）。'
+ },
+ {
+  id:'kikin_bijutsu', name:'芸術文化振興基金 美術・メディア芸術等の創造普及活動',
+  funder:'日本芸術文化振興会（基金）', region:'全国',
+  deadline:'令和8年度分終了（次回は例年10月末〜11月）', dlUrgent:false,
+  amount:'定額制4区分（50〜200万円）',
+  payment:'精算払（後払い）',
+  cashflow:'後払いのみ（立替必須）',
+  src:'https://www.ntj.jac.go.jp/grant/program/applicant/01/',
+  rules:[
+    p=> isOrg(p) ? PASS('芸術団体である（任意団体可）') : FAIL('芸術団体である','個人は対象外'),
+    p=> (hasVisualArtGenre(p)||hasFilmGenre(p)) ? PASS('美術・メディア芸術（漫画/アニメ/メディアアート等）の展示活動') : FAIL('美術・メディア芸術の展示活動','対象外分野'),
+    p=> CHECK('過去に国内で自ら主催した美術展示の実績','主催実績の有無を要確認'),
+  ],
+  softNote:'短編アニメ・実験映像も応募可。作品を販売する活動・文化庁補助金が入る活動は対象外。'
+ },
+ /* ===== 文芸・伝統芸能 ===== */
+ {
+  id:'kikin_dento', name:'芸術文化振興基金 伝統芸能・大衆芸能の公開活動',
+  funder:'日本芸術文化振興会（基金）', region:'全国',
+  deadline:'令和8年度分終了（次回は例年10月末〜11月）', dlUrgent:false,
+  amount:'区分・活動規模により算定',
+  payment:'精算払（後払い）が原則',
+  cashflow:'後払い（概算払は要件次第）',
+  src:'https://www.ntj.jac.go.jp/kikin/',
+  rules:[
+    p=> isOrg(p) ? PASS('芸術団体である（任意団体可）') : FAIL('芸術団体である','個人は対象外'),
+    p=> hasLiteraryTraditionalGenre(p) ? PASS('伝統芸能（文楽・歌舞伎・能楽・邦楽・邦舞等）・大衆芸能の公開活動') : FAIL('伝統芸能・大衆芸能の公開活動','対象外分野'),
+    p=> CHECK('保存・普及を主目的とする団体か','団体の設立目的・活動実態を要確認'),
+  ]
+ },
+ {
+  id:'pola_zaigai', name:'ポーラ美術振興財団 若手芸術家の在外研修助成',
+  funder:'ポーラ美術振興財団', region:'全国／海外',
+  deadline:'例年10〜11月（令和8年度分は終了）', dlUrgent:false,
+  amount:'1名12か月360万円以内（保存修復は2年720万）',
+  payment:'未確認',
+  cashflow:'未確認',
+  src:'https://www.pola-art-foundation.jp/',
+  rules:[
+    p=> isInd(p) ? PASS('個人である') : FAIL('個人である','団体は対象外'),
+    p=> hasVisualArtGenre(p) ? PASS('美術（絵画・彫刻・工芸等）の創作・研究') : FAIL('美術の創作・研究','対象外分野'),
+    p=> (p.age>=20 && p.age<40) ? PASS('20歳以上40歳未満') : FAIL('20歳以上40歳未満','年齢要件を満たさない（現在: '+p.age+'歳）'),
+    p=> CHECK('海外研修先の受入保証・国籍要件','受入保証の確保・日本国籍または永住資格を要確認'),
+  ],
+  softNote:'研修中は常勤職に就かないことが条件。'
+ },
+ {
+  id:'pola_kokusai', name:'ポーラ美術振興財団 美術に関する国際交流助成',
+  funder:'ポーラ美術振興財団', region:'全国／海外',
+  deadline:'例年10〜11月（2026年度分は終了）', dlUrgent:false,
+  amount:'1件200万円以内',
+  payment:'未確認',
+  cashflow:'未確認',
+  src:'https://www.pola-art-foundation.jp/',
+  rules:[
+    p=> hasVisualArtGenre(p) ? PASS('美術の国際交流活動') : FAIL('美術の国際交流活動','対象外分野'),
+    p=> isIntl(p) ? PASS('海外との国際交流活動') : CHECK('海外との国際交流活動','海外美術館との共同展・海外個展等に該当するか要確認'),
+  ],
+  softNote:'個人・NPO・任意団体等が対象。実績要件なし。'
+ },
+ {
+  id:'pola_dento', name:'ポーラ伝統文化振興財団 助成事業',
+  funder:'ポーラ伝統文化振興財団', region:'全国',
+  deadline:'例年2〜3月（次回具体日は要確認）', dlUrgent:false,
+  amount:'1件概ね30〜200万円（複数年事業は最長約3年）',
+  payment:'未確認',
+  cashflow:'未確認',
+  src:'https://www.polaculture.or.jp/',
+  rules:[
+    p=> hasLiteraryTraditionalGenre(p) ? PASS('伝統工芸・伝統芸能・民俗芸能等の保存振興') : FAIL('伝統工芸・伝統芸能・民俗芸能等の保存振興','対象外分野'),
+    p=> CHECK('保存記録・後継者育成・普及・調査研究等の活動内容','具体的な活動内容が対象要件に合致するか要確認'),
+  ],
+  softNote:'個人・団体いずれも可（法人格不要・原則恒常的活動体）。1個人・1団体1件。'
+ },
+ /* ===== 美術 ===== */
+ {
+  id:'nomura_art', name:'野村財団 芸術・文化助成（美術部門・個人活動助成金）',
+  funder:'野村財団', region:'全国',
+  deadline:'例年4月（2026年度分は終了）', dlUrgent:false,
+  amount:'上限100万円',
+  payment:'未確認',
+  cashflow:'未確認',
+  src:'https://www.nomurafoundation.or.jp/culture/art.html',
+  rules:[
+    p=> isInd(p) ? PASS('個人である') : FAIL('個人である','団体は対象外（本人のみで使用）'),
+    p=> hasVisualArtGenre(p) ? PASS('美術分野の活動') : FAIL('美術分野の活動','対象外分野'),
+    p=> CHECK('展覧会出品・個展・アーティスト・イン・レジデンス参加等の活動内容','具体的な活動が対象要件に合致するか要確認'),
+  ],
+  softNote:'ほかに個人奨学助成金・団体活動助成金も。'
+ },
+ {
+  id:'kao_bijutsu', name:'花王芸術・科学財団 美術展覧会への助成',
+  funder:'花王芸術・科学財団', region:'全国',
+  deadline:'例年10〜11月（2026年度分は終了）', dlUrgent:false,
+  amount:'1件 上限100万円',
+  payment:'前払い（開催月初めに銀行振込・団体口座必須）',
+  cashflow:'開催時交付（実質前払い）',
+  src:'https://www.kao-foundation.or.jp/art/art_exhibition/',
+  rules:[
+    p=> isOrg(p) ? PASS('美術館・博物館または団体が企画・開催') : FAIL('美術館・博物館または団体が企画・開催','個人名義では対象外（団体口座必須）'),
+    p=> hasVisualArtGenre(p) ? PASS('絵画・版画・彫刻等の展覧会') : FAIL('絵画・版画・彫刻等の展覧会','対象外分野'),
+    p=> CHECK('2年連続受給不可','前年度に本助成を受けていないか要確認'),
+  ],
+  softNote:'個人アーティストの制作費・管理運営費は対象外。'
+ },
+ {
+  id:'kao_mediaart', name:'花王芸術・科学財団 メディアアートへの助成',
+  funder:'花王芸術・科学財団', region:'全国',
+  deadline:'例年10〜11月（2026年度分は終了）', dlUrgent:false,
+  amount:'1件 上限100万円',
+  payment:'前払い（開催3か月前の月初に振込・団体口座必須）',
+  cashflow:'開催前交付（実質前払い）',
+  src:'https://www.kao-foundation.or.jp/art/mediaart/',
+  rules:[
+    p=> isOrg(p) ? PASS('団体口座での受給が可能') : FAIL('団体口座での受給が可能','個人名義では対象外'),
+    p=> (hasVisualArtGenre(p)||hasFilmGenre(p)) ? PASS('デジタル技術を核とするメディアアート') : FAIL('デジタル技術を核とするメディアアート','対象外分野'),
+    p=> CHECK('対面開催必須（オンライン限定不可）','会場での対面開催を予定しているか要確認'),
+  ]
+ },
+ {
+  id:'matsuo', name:'松尾芸能振興財団 助成事業',
+  funder:'松尾芸能振興財団', region:'全国',
+  deadline:'例年6月（2026年度分は終了）', dlUrgent:false,
+  amount:'上限100万円',
+  payment:'助成決定後に相談のうえ交付（方式は未確認）',
+  cashflow:'未確認',
+  src:'https://matsuo.or.jp/',
+  rules:[
+    p=> hasLiteraryTraditionalGenre(p) ? PASS('伝統芸能・工芸技術の継承・普及・創作') : FAIL('伝統芸能・工芸技術の継承・普及・創作','対象外分野'),
+    p=> CHECK('出演料等の人件費・コンクール主体の事業は対象外','対象経費・事業内容が要件に合致するか要確認'),
+  ],
+  softNote:'伝統芸能活動・工芸技術継承・地域芸能振興・伝統芸能教育の4区分。'
+ },
+ {
+  id:'togei_shien', name:'現代美術文化振興財団 陶芸家支援助成金',
+  funder:'現代美術文化振興財団', region:'全国',
+  deadline:'例年春（第15期は2026-06-05終了）', dlUrgent:false,
+  amount:'月額3万円（年額36万円・給付型）',
+  payment:'6か月ごとに本人口座へ振込（分割）',
+  cashflow:'分割前払い型',
+  src:'https://modernart-foundation.com/',
+  rules:[
+    p=> isInd(p) ? PASS('個人である') : FAIL('個人である','団体は対象外'),
+    p=> (hasVisualArtGenre(p)||hasLiteraryTraditionalGenre(p)) ? CHECK('陶芸（陶磁土を用いた立体造形）限定','美術・伝統工芸のうち陶芸に該当するか要確認') : FAIL('陶芸（陶磁土を用いた立体造形）限定','対象外分野'),
+    p=> CHECK('募集10名以内・累計3回まで再応募可','狭き門のため採択可能性は別途考慮'),
+  ],
+  softNote:'学校・師の推薦、または独自の創作活動が対象。'
  },
 ];
 
