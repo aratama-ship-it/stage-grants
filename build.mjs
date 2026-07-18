@@ -7,7 +7,7 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const VERIFIED = '2026-07-18';
-const SITE_NAME = '文化芸術 助成金ナビ';
+const SITE_NAME = '助成ものさし';
 const BASE_URL = 'https://aratama-ship-it.github.io/stage-grants/'; // 独自ドメイン取得後に差し替え
 const FORM_URL = 'https://forms.gle/sX3hTrCRdipxKsmCA'; // 情報訂正・お問い合わせ Googleフォーム
 // --- 解析・広告（値を入れて node build.mjs で有効化。空なら読み込まれずバナーも出ない）---
@@ -347,6 +347,7 @@ write('about.html', layout({
   body: `<h1>このサイトについて</h1>
 <div class="card">
 <p>${SITE_NAME}は、文化芸術・クリエイターのための助成金・補助金を、締切・助成額・「いつ入金されるか（支給時期）」・応募条件つきで探せる無料サイトです。舞台芸術・音楽・美術・映像・文芸/伝統芸能の5ジャンル、全国＋47都道府県・市区町村の${programs.length}制度を収録しています。</p>
+<p>名前の「ものさし」には、自分の活動と募集条件を照らし合わせて「応募できるか（合うか）」を測るための道具でありたい、という思いを込めています。採択を約束するのではなく、根拠となる条文とともに判断材料をお渡しします。</p>
 <h2>特徴</h2>
 <ul>
 <li>単なる一覧ではなく、応募条件を根拠つきで示し、適格性チェック機能で「自分が合うか」を確認できます。</li>
