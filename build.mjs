@@ -10,6 +10,7 @@ const VERIFIED = '2026-07-18';
 const SITE_NAME = '助成ものさし';
 const BASE_URL = 'https://aratama-ship-it.github.io/stage-grants/'; // 独自ドメイン取得後に差し替え
 const FORM_URL = 'https://forms.gle/sX3hTrCRdipxKsmCA'; // 情報訂正・お問い合わせ Googleフォーム
+const KOUBO_URL = 'https://aratama-ship-it.github.io/art-koubo/'; // 姉妹サイト 公募ものさし
 // --- 解析・広告（値を入れて node build.mjs で有効化。空なら読み込まれずバナーも出ない）---
 const ANALYTICS_GA4 = '';   // 例: 'G-XXXXXXXXXX'（Google Analytics 4 の測定ID）
 const ADSENSE_CLIENT = '';  // 例: 'ca-pub-1234567890123456'（AdSense 承認後のクライアントID）
@@ -81,6 +82,7 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 .brand{font-weight:700;font-size:15px;margin-right:10px;color:var(--ink)}
 .nav a{padding:6px 10px;border-radius:8px;font-size:13.5px;color:var(--sub)}
 .nav a.on{background:#eaeeff;color:var(--accent);font-weight:600}
+.nav .sister{margin-left:auto;background:#eef3ff;color:var(--accent);font-weight:600}
 main{max-width:900px;margin:0 auto;padding:18px 14px 60px}
 h1{font-size:22px;margin:6px 0 6px}h2{font-size:17px;margin:26px 0 12px}
 .lede{color:var(--sub);margin:0 0 6px}
@@ -131,14 +133,14 @@ a.pref:hover{text-decoration:none;border-color:var(--accent)}
 <script src="${rel}assets/tracking.js" defer></script>
 </head>
 <body>
-<div class="nav"><div class="nav-in"><span class="brand">${SITE_NAME}</span>${nav}</div></div>
+<div class="nav"><div class="nav-in"><span class="brand">${SITE_NAME}</span>${nav}<a class="sister" href="${KOUBO_URL}" target="_blank" rel="noopener">公募は「公募ものさし」へ →</a></div></div>
 <main>
 ${body}
 </main>
 <footer><div class="foot-in">
 <!-- ad-slot: フッター広告（AdSense審査後に有効化） -->
 情報は${VERIFIED}に各公式サイト・募集要項で一次確認したものです（順次更新）。締切・条件は変動します。最終判断は各助成元の最新の募集要項でご確認ください。<br>
-<a href="${rel}about.html">このサイトについて</a> ・ <a href="${rel}privacy.html">プライバシー</a> ・ <a href="${rel}disclaimer.html">免責事項・情報訂正</a>
+<a href="${rel}about.html">このサイトについて</a> ・ <a href="${rel}privacy.html">プライバシー</a> ・ <a href="${rel}disclaimer.html">免責事項・情報訂正</a> ・ <a href="${KOUBO_URL}" target="_blank" rel="noopener">姉妹サイト 公募ものさし</a>
 </div></footer>
 </body>
 </html>`;
