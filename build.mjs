@@ -9,6 +9,7 @@ const ROOT = dirname(fileURLToPath(import.meta.url));
 const VERIFIED = '2026-07-18';
 const SITE_NAME = '文化芸術 助成金ナビ';
 const BASE_URL = 'https://aratama-ship-it.github.io/stage-grants/'; // 独自ドメイン取得後に差し替え
+const FORM_URL = 'https://forms.gle/sX3hTrCRdipxKsmCA'; // 情報訂正・お問い合わせ Googleフォーム
 // --- 解析・広告（値を入れて node build.mjs で有効化。空なら読み込まれずバナーも出ない）---
 const ANALYTICS_GA4 = '';   // 例: 'G-XXXXXXXXXX'（Google Analytics 4 の測定ID）
 const ADSENSE_CLIENT = '';  // 例: 'ca-pub-1234567890123456'（AdSense 承認後のクライアントID）
@@ -383,7 +384,8 @@ write('disclaimer.html', layout({
 <p>本サイトの掲載情報および適格性チェックの結果は、募集要項の明示内容に基づく参考情報です。「適格」ではなく「条件上、該当の可能性がある」ことを示すもので、採択可能性・最終的な適格性を保証しません。応募の最終判断は必ず各助成元の最新の募集要項でご確認ください。締切・金額・条件は変動します。</p>
 <h2>情報訂正の窓口</h2>
 <p>掲載内容の誤り・古い情報にお気づきの場合、また掲載制度に関するご連絡は、下記までお寄せください。確認のうえ速やかに修正します。</p>
-<p>連絡先（準備中）: <em>お問い合わせフォーム／メールアドレスを設置予定</em></p>
+<p><a class="cta" href="${FORM_URL}" target="_blank" rel="noopener">情報訂正・お問い合わせフォームを開く →</a></p>
+<p class="note">匿名で送信できます。返信をご希望の場合のみ、フォーム内でメールアドレスをご記入ください。入力内容は運営者のみが確認します。</p>
 <h2>更新履歴</h2>
 <ul>
 <li>2026-07-18: ${programs.length}制度に拡充（全国47都道府県の主要市区町村まで収録）。適格性チェックを全5ジャンル・全制度対応に拡張。</li>
