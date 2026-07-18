@@ -100,7 +100,7 @@
 <header>
   <h1>文化芸術 助成金 適格性チェック</h1>
   <p class="lede">団体・企画の情報から、応募できる助成を根拠つきで判定します。舞台・音楽・美術・映像・文芸/伝統芸能に対応。</p>
-  <span class="proto-tag">PROTOTYPE · 全国＋東京・大阪・愛知等の検証済み助成66件 · 2026-07-18時点</span>
+  <span class="proto-tag">PROTOTYPE · 全国の助成237件を判定対象（うち66件は個別ルールで手厚く判定） · 2026-07-18時点</span>
 </header>
 
 <main>
@@ -139,16 +139,12 @@
       <div class="row">
         <div>
           <label>活動の本拠地（都道府県）</label>
-          <select id="prefecture">
-            <option>東京都</option><option>三重県</option><option>大阪府</option>
-            <option>愛知県</option><option>その他</option>
-          </select>
+          <select id="prefecture"></select>
         </div>
         <div>
-          <label>市区町村（区・市の助成用）</label>
-          <select id="city">
-            <option value="">—</option><option>杉並区</option><option>港区</option><option>大阪市</option><option>名古屋市</option><option>その他</option>
-          </select>
+          <label>市区町村（区・市の助成用、分かれば入力）</label>
+          <input id="city" type="text" list="cityDatalist" placeholder="例: 杉並区、松山市">
+          <datalist id="cityDatalist"></datalist>
         </div>
       </div>
       <label>分野（複数選択可）</label>
@@ -213,9 +209,16 @@
   <div id="results" class="hidden"></div>
 </main>
 
-<footer>データは2026-07-17に各公式サイト・募集要項PDFで一次確認したもの（全国＋東京の検証済み助成を順次拡充中）。締切等は変動します。</footer>
+<footer>データは各公式サイト・募集要項PDFで一次確認したもの（2026年7月時点）。66件は個別ルールで手厚く判定、残りは地域・分野の自動判定（対象者要件は要確認）。締切等は変動します。</footer>
 
 <script>
+/* ---------- 47都道府県 ---------- */
+const PREF_LIST = ['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
+(function(){
+  const sel=document.getElementById('prefecture');
+  sel.innerHTML=PREF_LIST.map(pr=>`<option${pr==='東京都'?' selected':''}>${pr}</option>`).join('');
+})();
+
 /* ---------- プロフィール収集 ---------- */
 const state = { applicantKind:'organization', genres:['演劇','現代舞踊'], doubleFunding:'no' };
 function seg(id,key){document.querySelectorAll('#'+id+' button').forEach(b=>b.onclick=()=>{
@@ -270,6 +273,62 @@ const hasLiteraryTraditionalGenre=p=>p.genres.includes('文芸・伝統芸能');
 const hasAnyGenre=p=>p.genres.length>0;
 const hasCorp=p=>isOrg(p)&&p.legalForm!=='voluntary_association';
 const isIntl=p=>p.activityType==='international';
+
+/* ---------- 汎用ルールエンジン（未収録データの自動判定用） ---------- */
+const KANSAI_PREFS=['大阪府','京都府','兵庫県','滋賀県','奈良県','和歌山県'];
+function coarseGenreSet(p){
+  const s=new Set();
+  if(hasStageGenre(p)) s.add('舞台');
+  if(hasMusicGenre(p)) s.add('音楽');
+  if(hasVisualArtGenre(p)) s.add('美術');
+  if(hasFilmGenre(p)) s.add('映像');
+  if(hasLiteraryTraditionalGenre(p)) s.add('文芸・伝統芸能');
+  return s;
+}
+function autoRegionRule(region){
+  if(region.includes('東京以外')) return p=>(p.prefecture==='東京都')?FAIL('対象地域は東京都以外','東京都は対象外'):PASS('対象地域（東京都以外）');
+  if(region.includes('関西')) return p=>KANSAI_PREFS.includes(p.prefecture)?PASS('関西2府4県が拠点'):CHECK('関西2府4県が拠点','拠点が関西2府4県か要確認');
+  if(region.includes('全国')) return p=>PASS('全国が対象（拠点地域を問わない）');
+  const pref=PREF_LIST.find(s=>region.startsWith(s));
+  if(!pref) return p=>CHECK('地域要件','対象地域「'+region+'」との一致を要確認');
+  const city=region.slice(pref.length).trim();
+  if(!city) return p=>(p.prefecture===pref)?PASS(pref+'内に拠点'):FAIL(pref+'内に拠点',pref+'以外は対象外');
+  return p=>{
+    if(p.city && p.city.trim()===city) return PASS(city+'に拠点（在住・活動）');
+    if(p.prefecture===pref) return CHECK(city+'に拠点（在住・活動）',pref+'内だが'+city+'かどうか要確認');
+    return FAIL(city+'に拠点（在住・活動）',pref+'外は対象外');
+  };
+}
+function autoGenreRule(genres){
+  const g=(genres&&genres.length)?genres:['舞台','音楽','美術','映像','文芸・伝統芸能'];
+  const verified=g.length<5; // 5ジャンル一括タグは未検証の既定値。狭いタグ=個別検証済み
+  const label=g.join('・');
+  return p=>{
+    const cg=coarseGenreSet(p);
+    if(cg.size===0) return CHECK('対象分野（'+label+'）','分野を選択すると判定できます');
+    const hit=g.some(x=>cg.has(x));
+    if(verified) return hit ? PASS('対象分野（'+label+'）に該当') : FAIL('対象分野（'+label+'）に該当','選択した分野は対象外');
+    const coreHit=cg.has('舞台')||cg.has('音楽');
+    return coreHit ? PASS('対象分野（舞台芸術・音楽は募集要項に記載あり）') : CHECK('対象分野','美術・映像・文芸での対象可否はこの制度では未検証。募集要項で要確認');
+  };
+}
+const TEAM_REQUIRED_RE=/個人不可|個人は対象外|団体のみ|団体限定|[2-9２-９][人名]以上|法人格(を有する団体|のある団体)/;
+const INDIV_ONLY_RE=/個人のみ|団体不可|本人のみ/;
+function autoEligibilityRule(conditions){
+  const text=(conditions||[]).join('　');
+  if(!text) return null;
+  return p=>{
+    if(INDIV_ONLY_RE.test(text) && isOrg(p)) return FAIL('個人限定','この制度は個人のみが対象（団体不可）');
+    if(TEAM_REQUIRED_RE.test(text) && isInd(p)) return FAIL('団体・グループ限定','この制度は団体向け（個人単独は対象外の可能性）');
+    return CHECK('対象者・活動要件（募集要項より）',text);
+  };
+}
+function genericRulesFor(pr){
+  const rules=[autoRegionRule(pr.region), autoGenreRule(pr.genres)];
+  const elig=autoEligibilityRule(pr.conditions);
+  if(elig) rules.push(elig);
+  return rules;
+}
 
 /* ---------- 制度データ（2026-07-17 一次検証済み） ---------- */
 const PROGRAMS = [
@@ -1241,6 +1300,27 @@ const PROGRAMS = [
  },
 ];
 
+/* ---------- 全制度データの読み込み（手厚いルール66件＋残り全件は汎用ルールで自動判定） ---------- */
+let ALL_PROGRAMS = PROGRAMS.slice();
+const CURATED_IDS = new Set(PROGRAMS.map(p=>p.id));
+const cityCandidates = new Set();
+fetch('data/programs.data.json').then(r=>r.json()).then(list=>{
+  const extra = list.filter(pr=>!CURATED_IDS.has(pr.id)).map(pr=>({
+    id:pr.id, name:pr.name, funder:pr.funder, region:pr.region,
+    deadline:pr.deadline, dlUrgent:!!pr.dlUrgent, amount:pr.amount,
+    payment:pr.payment||pr.cashflow||'未確認', cashflow:pr.cashflow||pr.payment||'未確認',
+    src:pr.src, softNote:pr.note||'', generic:true,
+    rules:genericRulesFor(pr),
+  }));
+  ALL_PROGRAMS = PROGRAMS.concat(extra);
+  list.forEach(pr=>{
+    const pref=PREF_LIST.find(s=>pr.region.startsWith(s));
+    if(pref){ const c=pr.region.slice(pref.length).trim(); if(c) cityCandidates.add(c); }
+  });
+  const dl=document.getElementById('cityDatalist');
+  if(dl) dl.innerHTML=[...cityCandidates].sort().map(c=>`<option value="${c}">`).join('');
+}).catch(e=>console.error('全件データの読み込みに失敗（66件の手厚い判定のみで継続）',e));
+
 /* ---------- 判定 ---------- */
 function assess(program,p){
   const results = program.rules.map(fn=>fn(p));
@@ -1260,7 +1340,7 @@ const RCLS={pass:'pass',fail:'fail',needs_check:'check'};
 
 function run(){
   const p=readProfile();
-  const assessed=PROGRAMS.map(pr=>({pr,...assess(pr,p)}));
+  const assessed=ALL_PROGRAMS.map(pr=>({pr,...assess(pr,p)}));
   const order={eligible:0,needs_check:1,ineligible:2};
   assessed.sort((a,b)=>order[a.verdict]-order[b.verdict]);
   const c={eligible:0,needs_check:0,ineligible:0};
@@ -1268,7 +1348,7 @@ function run(){
 
   let html=`<div class="card">
     <button class="backbtn" onclick="back()"><span aria-hidden="true">←</span> 条件を変更する</button>
-    <h2><span class="n">✓</span>判定結果（${PROGRAMS.length}制度）</h2>
+    <h2><span class="n">✓</span>判定結果（${ALL_PROGRAMS.length}制度）</h2>
     <div class="summary">
       <span class="pill ok">条件適合 ${c.eligible}</span>
       <span class="pill chk">要確認 ${c.needs_check}</span>
@@ -1304,7 +1384,7 @@ function run(){
       html+=`<div class="qbox"><p class="h">🗒️ 助成元への確認事項（自動生成）</p><p>${a.pr.genForFunder}</p></div>`;
     }
     html+=`<div class="src">📄 出典: <a href="${a.pr.src}" target="_blank" rel="noopener">${a.pr.funder} 公式ページ</a></div>
-      <p class="verified">最終確認: 2026-07-17（募集要項PDFで一次確認）</p>
+      <p class="verified">${a.pr.generic ? 'この制度は地域・分野の自動判定です。対象者要件は「要確認」の内容を出典ページで必ずご確認ください。' : '最終確認: 一次資料（募集要項PDF等）で個別に確認済み'}</p>
     </div></div>`;
   });
   html+=`<button class="cta" onclick="back()" style="background:#8a8d9a">← 条件を変更する</button></div>`;
