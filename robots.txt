@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://aratama-ship-it.github.io/stage-grants/sitemap.xml

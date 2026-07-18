@@ -202,7 +202,7 @@
     </div>
 
     <button class="cta" onclick="run()">適格性を判定する</button>
-    <p class="disclaimer">これは検証用プロトタイプです。判定は募集要項の明示条件のみに基づく機械的なもので、採択可能性を示すものではありません。最終判断は必ず各助成元の最新の募集要項でご確認ください。</p>
+    <p class="disclaimer">これは検証用プロトタイプです。判定は募集要項の明示条件のみに基づく機械的なもので、採択可能性や適格性の認定を示すものではありません。最終判断は必ず各助成元の最新の募集要項でご確認ください。<br>🔒 入力内容はお使いのブラウザ内でのみ処理され、サーバーに送信・保存されることはありません。</p>
   </div>
 
   <!-- 結果 -->
@@ -312,14 +312,19 @@ function autoGenreRule(genres){
     return coreHit ? PASS('対象分野（舞台芸術・音楽は募集要項に記載あり）') : CHECK('対象分野','美術・映像・文芸での対象可否はこの制度では未検証。募集要項で要確認');
   };
 }
-const TEAM_REQUIRED_RE=/個人不可|個人は対象外|団体のみ|団体限定|[2-9２-９][人名]以上|法人格(を有する団体|のある団体)/;
+/* 誤FAILは申請機会を奪うため、明示的な文言があるときだけFAILし、人数・法人格などの示唆はCHECKに倒す。
+   「個人も可」等の肯定文言があれば団体要件ヒントは出さない */
+const TEAM_EXPLICIT_RE=/個人不可|個人は対象外|個人単独では?(申請|対象外)|個人での申請は不可|団体のみ|団体限定/;
+const TEAM_HINT_RE=/[2-9２-９][人名]以上|法人格(を有する団体|のある団体)/;
 const INDIV_ONLY_RE=/個人のみ|団体不可|本人のみ/;
+const INDIV_OK_RE=/個人も可|個人可(?!否)|(また|又)は個人|個人(及び|および)団体|団体(又は|または)個人|個人[（(][1１]名|18歳以上の個人|個人単独での(応募|申請)が(可能|認められ)/;
 function autoEligibilityRule(conditions){
   const text=(conditions||[]).join('　');
   if(!text) return null;
   return p=>{
     if(INDIV_ONLY_RE.test(text) && isOrg(p)) return FAIL('個人限定','この制度は個人のみが対象（団体不可）');
-    if(TEAM_REQUIRED_RE.test(text) && isInd(p)) return FAIL('団体・グループ限定','この制度は団体向け（個人単独は対象外の可能性）');
+    if(isInd(p) && TEAM_EXPLICIT_RE.test(text)) return FAIL('団体・グループ限定','個人単独は対象外と明記。ただし実行委員会等を組成すれば申請できる場合があります');
+    if(isInd(p) && !INDIV_OK_RE.test(text) && TEAM_HINT_RE.test(text)) return CHECK('団体要件の可能性','構成人数・法人格などの団体要件あり。グループを組めば申請できる可能性があるため要項を要確認');
     return CHECK('対象者・活動要件（募集要項より）',text);
   };
 }
@@ -1331,9 +1336,9 @@ function assess(program,p){
   return {results,verdict};
 }
 const V = {
-  eligible:{cls:'ok',label:'条件適合',pill:'ok'},
+  eligible:{cls:'ok',label:'該当可能性あり',pill:'ok'},
   needs_check:{cls:'chk',label:'要確認',pill:'chk'},
-  ineligible:{cls:'ng',label:'対象外',pill:'ng'}
+  ineligible:{cls:'ng',label:'明示条件に不一致',pill:'ng'}
 };
 const RICON={pass:'✓',fail:'×',needs_check:'?'};
 const RCLS={pass:'pass',fail:'fail',needs_check:'check'};
@@ -1346,19 +1351,9 @@ function run(){
   const c={eligible:0,needs_check:0,ineligible:0};
   assessed.forEach(a=>c[a.verdict]++);
 
-  let html=`<div class="card">
-    <button class="backbtn" onclick="back()"><span aria-hidden="true">←</span> 条件を変更する</button>
-    <h2><span class="n">✓</span>判定結果（${ALL_PROGRAMS.length}制度）</h2>
-    <div class="summary">
-      <span class="pill ok">条件適合 ${c.eligible}</span>
-      <span class="pill chk">要確認 ${c.needs_check}</span>
-      <span class="pill ng">対象外 ${c.ineligible}</span>
-    </div>
-    <p class="hint">「対象外」も、なぜ外れるかを根拠つきで即答できるのがこのツールの価値です。締切・支給時期も各カードで確認できます。</p>`;
-
-  assessed.forEach((a,i)=>{
+  function renderCard(a, bodyHidden){
     const v=V[a.verdict];
-    html+=`<div class="res">
+    let s=`<div class="res">
       <div class="res-head" onclick="this.parentNode.querySelector('.res-body').classList.toggle('hidden')">
         <div>
           <p class="res-title">${a.pr.name}</p>
@@ -1366,27 +1361,49 @@ function run(){
         </div>
         <span class="verdict ${v.cls}">${v.label}</span>
       </div>
-      <div class="res-body${i>0&&a.verdict==='ineligible'?' hidden':''}">
+      <div class="res-body${bodyHidden?' hidden':''}">
         <div class="meta">
           <span class="tag ${a.pr.dlUrgent?'dl':''}">締切: ${a.pr.deadline}</span>
           <span class="tag">助成額: ${a.pr.amount}</span>
           <span class="tag cash">💰 ${a.pr.cashflow}</span>
+          ${a.pr.generic?'<span class="tag">自動判定</span>':''}
         </div>`;
     a.results.forEach(r=>{
-      html+=`<div class="rule ${RCLS[r.result]}">
+      s+=`<div class="rule ${RCLS[r.result]}">
         <span class="ic">${RICON[r.result]}</span>
         <span class="txt"><b>${r.txt}</b>${r.why?`<span class="why">${r.why}</span>`:''}</span>
       </div>`;
     });
-    if(a.pr.softNote) html+=`<p class="hint" style="margin-top:10px">ℹ️ ${a.pr.softNote}</p>`;
-    // 支給時期が未確認 → 質問文を提示
+    if(a.pr.softNote) s+=`<p class="hint" style="margin-top:10px">ℹ️ ${a.pr.softNote}</p>`;
     if(a.pr.cashflow.includes('未確認') && a.pr.genForFunder){
-      html+=`<div class="qbox"><p class="h">🗒️ 助成元への確認事項（自動生成）</p><p>${a.pr.genForFunder}</p></div>`;
+      s+=`<div class="qbox"><p class="h">🗒️ 助成元への確認事項（自動生成）</p><p>${a.pr.genForFunder}</p></div>`;
     }
-    html+=`<div class="src">📄 出典: <a href="${a.pr.src}" target="_blank" rel="noopener">${a.pr.funder} 公式ページ</a></div>
+    s+=`<div class="src">📄 出典: <a href="${a.pr.src}" target="_blank" rel="noopener">${a.pr.funder} 公式ページ</a></div>
       <p class="verified">${a.pr.generic ? 'この制度は地域・分野の自動判定です。対象者要件は「要確認」の内容を出典ページで必ずご確認ください。' : '最終確認: 一次資料（募集要項PDF等）で個別に確認済み'}</p>
     </div></div>`;
-  });
+    return s;
+  }
+
+  let html=`<div class="card">
+    <button class="backbtn" onclick="back()"><span aria-hidden="true">←</span> 条件を変更する</button>
+    <h2><span class="n">✓</span>判定結果（${ALL_PROGRAMS.length}制度）</h2>
+    <div class="summary">
+      <span class="pill ok">該当可能性あり ${c.eligible}</span>
+      <span class="pill chk">要確認 ${c.needs_check}</span>
+      <span class="pill ng">明示条件に不一致 ${c.ineligible}</span>
+    </div>
+    <p class="hint">判定は募集要項の明示条件のみに基づく参考情報で、採択や適格性を保証するものではありません。最終判断は必ず各助成元の最新の募集要項でご確認ください。入力内容はブラウザ内でのみ処理され、送信されません。</p>`;
+
+  const visible=assessed.filter(a=>a.verdict!=='ineligible');
+  const failed=assessed.filter(a=>a.verdict==='ineligible');
+  visible.forEach(a=>{ html+=renderCard(a,false); });
+  if(failed.length){
+    html+=`<div style="margin:16px 0 6px"><button class="backbtn" onclick="document.getElementById('failList').classList.toggle('hidden')">明示条件に不一致 ${failed.length}件を表示／非表示</button></div>
+    <p class="hint">「不一致」も、なぜ外れるかを根拠つきで確認できます。グループを組む等で状況が変われば該当する場合もあります。</p>
+    <div id="failList" class="hidden">`;
+    failed.forEach(a=>{ html+=renderCard(a,true); });
+    html+=`</div>`;
+  }
   html+=`<button class="cta" onclick="back()" style="background:#8a8d9a">← 条件を変更する</button></div>`;
 
   document.getElementById('form').classList.add('hidden');

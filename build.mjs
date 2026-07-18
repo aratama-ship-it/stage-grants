@@ -6,8 +6,9 @@ import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
-const VERIFIED = '2026-07-17';
+const VERIFIED = '2026-07-18';
 const SITE_NAME = '文化芸術 助成金ナビ';
+const BASE_URL = 'https://aratama-ship-it.github.io/stage-grants/'; // 独自ドメイン取得後に差し替え
 // --- 解析・広告（値を入れて node build.mjs で有効化。空なら読み込まれずバナーも出ない）---
 const ANALYTICS_GA4 = '';   // 例: 'G-XXXXXXXXXX'（Google Analytics 4 の測定ID）
 const ADSENSE_CLIENT = '';  // 例: 'ca-pub-1234567890123456'（AdSense 承認後のクライアントID）
@@ -142,8 +143,17 @@ ${body}
 </html>`;
 }
 
+// 受付状態を締切テキストから機械判定（不確実なものは「要確認」に倒す）
+function recruitStatus(p) {
+  const t = p.deadline || '';
+  if (p.dlUrgent || /受付中|募集中|随時|通年/.test(t)) return { label: '受付中・随時', cls: 'ok' };
+  if (/締切済み|締め?切(り)?済|終了|募集は終了/.test(t)) return { label: '募集期間外（次回情報は未確認）', cls: '' };
+  return { label: '募集時期は要確認', cls: '' };
+}
 function statusTags(p) {
   const t = [];
+  const st = recruitStatus(p);
+  t.push(`<span class="tag${st.cls === 'ok' ? ' dl' : ''}">${st.label}</span>`);
   if (p.dlUrgent) t.push(`<span class="tag dl">締切: ${esc(p.deadline)}</span>`);
   else t.push(`<span class="tag">${esc(p.deadline)}</span>`);
   t.push(`<span class="tag">${esc(p.amount)}</span>`);
@@ -157,7 +167,22 @@ function gitem(p, rel) {
 <div class="tags">${statusTags(p)}</div></a>`;
 }
 
+const WRITTEN_PAGES = [];
 function write(rel, html) {
+  // canonical / OGP を自動注入（title・descriptionは生成済みHTMLから抽出）
+  const url = BASE_URL + rel.replace(/^index\.html$/, '');
+  const title = (html.match(/<title>([\s\S]*?)<\/title>/) || [])[1] || SITE_NAME;
+  const desc = (html.match(/<meta name="description" content="([\s\S]*?)">/) || [])[1] || '';
+  const head = `<link rel="canonical" href="${url}">
+<meta property="og:site_name" content="${esc(SITE_NAME)}">
+<meta property="og:type" content="website">
+<meta property="og:url" content="${url}">
+<meta property="og:title" content="${title}">
+<meta property="og:description" content="${desc}">
+<meta property="og:locale" content="ja_JP">
+<meta name="twitter:card" content="summary">`;
+  html = html.replace(/(<meta name="description" content="[\s\S]*?">)/, `$1\n${head}`);
+  WRITTEN_PAGES.push(rel);
   const abs = join(ROOT, rel);
   mkdirSync(dirname(abs), { recursive: true });
   writeFileSync(abs, html);
@@ -298,6 +323,7 @@ for (const p of programs) {
 <p class="lede">${esc(p.funder)} ・ ${esc(p.region)}</p>
 <div class="tags">${statusTags(p)}</div>
 <div class="card">
+<div class="kv"><div class="k">受付状態（本サイトの機械判定）</div><div class="v">${recruitStatus(p).label}</div></div>
 <div class="kv"><div class="k">受付状況・締切</div><div class="v">${esc(p.deadline)}</div></div>
 <div class="kv"><div class="k">助成額</div><div class="v">${esc(p.amount)}</div></div>
 <div class="kv"><div class="k">支給時期（キャッシュフロー）</div><div class="v">${esc(p.cashflow)}<br><span class="note">${esc(p.payment)}</span></div></div>
@@ -319,7 +345,7 @@ write('about.html', layout({
   title: `このサイトについて｜${SITE_NAME}`, desc: `${SITE_NAME}の目的・情報源・更新方針。`, rel: '', active: 'about',
   body: `<h1>このサイトについて</h1>
 <div class="card">
-<p>${SITE_NAME}は、文化芸術・クリエイターのための助成金・補助金を、締切・助成額・「いつ入金されるか（支給時期）」・応募条件つきで探せる無料サイトです。まずは舞台芸術（演劇・舞踊・ダンス・サーカス）から、全国＋東京・大阪・名古屋の${programs.length}制度を収録しています。</p>
+<p>${SITE_NAME}は、文化芸術・クリエイターのための助成金・補助金を、締切・助成額・「いつ入金されるか（支給時期）」・応募条件つきで探せる無料サイトです。舞台芸術・音楽・美術・映像・文芸/伝統芸能の5ジャンル、全国＋47都道府県・市区町村の${programs.length}制度を収録しています。</p>
 <h2>特徴</h2>
 <ul>
 <li>単なる一覧ではなく、応募条件を根拠つきで示し、適格性チェック機能で「自分が合うか」を確認できます。</li>
@@ -341,6 +367,8 @@ write('privacy.html', layout({
 <p>同意の選択はお使いのブラウザに保存されます。取り消すには、ブラウザのサイトデータ（localStorage）を削除してください。</p>
 <h2>広告について</h2>
 <p>本サイトは運営費のためにディスプレイ広告（Google AdSense 等）を掲載する場合があります。広告の配信にはCookie等が利用され、上記のとおり同意した場合にのみ読み込まれます。広告の内容・配信は配信事業者により行われ、助成情報の掲載内容や適格性の判定結果・並び順に影響することはありません。（本サイトでは商用サービスへのアフィリエイト送客は行いません。）</p>
+<h2>適格性チェックの入力内容について</h2>
+<p>適格性チェックツールに入力いただいた条件（拠点・分野・実績など）は、<strong>お使いのブラウザ内でのみ処理され、本サイトのサーバーや第三者に送信されることはありません</strong>。ページを閉じると入力内容は破棄されます。</p>
 <h2>個人情報</h2>
 <p>本サイトはお問い合わせ等でいただいた個人情報を、対応の目的以外に利用しません。第三者への提供は法令に基づく場合を除き行いません。</p>
 <p>お問い合わせ・訂正のご連絡は <a href="disclaimer.html">情報訂正の窓口</a> へ。</p>
@@ -357,8 +385,23 @@ write('disclaimer.html', layout({
 <p>掲載内容の誤り・古い情報にお気づきの場合、また掲載制度に関するご連絡は、下記までお寄せください。確認のうえ速やかに修正します。</p>
 <p>連絡先（準備中）: <em>お問い合わせフォーム／メールアドレスを設置予定</em></p>
 <h2>更新履歴</h2>
-<ul><li>${VERIFIED}: 全国＋東京・大阪・名古屋の${programs.length}制度を掲載してサイト公開。</li></ul>
+<ul>
+<li>2026-07-18: ${programs.length}制度に拡充（全国47都道府県の主要市区町村まで収録）。適格性チェックを全5ジャンル・全制度対応に拡張。</li>
+<li>2026-07-17: サイト公開。全国＋東京・大阪・名古屋の46制度でスタートし、同日中に155制度・全47都道府県対応まで拡充。</li>
+</ul>
 </div>`,
 }));
 
-console.log(`Generated: index, grants, calendar, ${BUCKETS.length} regions, ${GENRES.length} genres, ${programs.length} grant pages, 3 policy pages.`);
+// ---- sitemap.xml / robots.txt ----
+{
+  const staticPages = ['check.html'];
+  const urls = [...WRITTEN_PAGES, ...staticPages].map((rel) => BASE_URL + rel.replace(/^index\.html$/, ''));
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map((u) => `<url><loc>${u}</loc><lastmod>${VERIFIED}</lastmod></url>`).join('\n')}
+</urlset>`;
+  writeFileSync(join(ROOT, 'sitemap.xml'), sitemap);
+  writeFileSync(join(ROOT, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}sitemap.xml\n`);
+}
+
+console.log(`Generated: index, grants, calendar, ${BUCKETS.length} regions, ${GENRES.length} genres, ${programs.length} grant pages, 3 policy pages, sitemap(${WRITTEN_PAGES.length + 1} urls), robots.txt.`);
