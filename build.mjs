@@ -51,6 +51,19 @@ const genresOf = (p) => (Array.isArray(p.genres) && p.genres.length ? p.genres :
 const COMING = [];
 const openPrograms = programs.filter((p) => p.dlUrgent);
 
+const SEARCH_CSS = `
+.searchbox{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px 16px;margin:16px 0;box-shadow:var(--shadow)}
+.searchbox label{display:block;font-size:13px;font-weight:700;margin-bottom:7px}
+.searchline{display:flex;gap:8px}
+.searchline input{min-width:0;flex:1;border:1px solid #cfd2de;border-radius:10px;padding:11px 12px;font:inherit;color:var(--ink);background:#fff}
+.searchline input:focus{outline:3px solid var(--accent-soft);border-color:var(--accent)}
+.searchline button{border:0;border-radius:10px;padding:0 17px;background:var(--accent);color:#fff;font:inherit;font-weight:700;cursor:pointer}
+.search-help,.search-status{font-size:12px;color:var(--sub);margin:7px 0 0}
+.search-status{font-weight:600;color:var(--accent)}
+.search-empty{background:#fff;border:1px dashed var(--line);border-radius:12px;padding:18px;margin:14px 0;color:var(--sub)}
+.search-group[hidden],.gitem[hidden],.search-empty[hidden]{display:none!important}
+@media(max-width:480px){.searchline{align-items:stretch}.searchline button{padding:0 14px}}`;
+
 const HOME_CSS = `
 .home-hero{display:grid;grid-template-columns:minmax(0,1fr) 188px;grid-template-rows:auto auto auto;align-items:center;column-gap:24px;min-height:190px;padding:4px 4px 8px 0}
 .home-site-name{grid-column:1;grid-row:1;align-self:end;display:flex;align-items:center;gap:9px;margin:4px 0 0;color:var(--accent);font-size:17px;font-weight:800;letter-spacing:.045em}
@@ -218,11 +231,24 @@ function statusTags(p) {
   t.push(`<span class="tag cash">支給: ${esc(p.cashflow)}</span>`);
   return t.join('');
 }
-function gitem(p, rel) {
-  return `<a class="gitem" href="${rel}grants/${p.id}.html">
+function searchTextOf(p) {
+  return [p.name, p.funder, p.region, p.deadline, p.amount, p.payment, p.cashflow, p.note,
+    ...(p.conditions || []), ...genresOf(p)].filter(Boolean).join(' ');
+}
+function gitem(p, rel, searchable = false) {
+  return `<a class="gitem"${searchable ? ` data-search="${esc(searchTextOf(p))}"` : ''} href="${rel}grants/${p.id}.html">
 <div class="t">${esc(p.name)}</div>
 <div class="m">${esc(p.funder)} ・ ${esc(p.region)}</div>
 <div class="tags">${statusTags(p)}</div></a>`;
+}
+
+function searchForm({ action = 'grants.html', live = false } = {}) {
+  return `<form class="searchbox"${live ? ' id="grant-search"' : ''} action="${action}" method="get" role="search">
+<label for="grant-q${live ? '-live' : ''}">制度名・地域・ジャンル・応募条件からフリーワード検索</label>
+<div class="searchline"><input id="grant-q${live ? '-live' : ''}" name="q" type="search" autocomplete="off" placeholder="例：兵庫 舞台 個人" aria-describedby="grant-search-help${live ? '-live' : ''}"><button type="submit">探す</button></div>
+<p class="search-help" id="grant-search-help${live ? '-live' : ''}">スペースで区切ると、すべての言葉を含む助成に絞れます。</p>
+${live ? '<p class="search-status" id="grant-search-status" aria-live="polite"></p>' : ''}
+</form>`;
 }
 
 const WRITTEN_PAGES = [];
@@ -232,13 +258,20 @@ function write(rel, html) {
   const title = (html.match(/<title>([\s\S]*?)<\/title>/) || [])[1] || SITE_NAME;
   const desc = (html.match(/<meta name="description" content="([\s\S]*?)">/) || [])[1] || '';
   const head = `<link rel="canonical" href="${url}">
+<link rel="icon" type="image/png" href="${BASE_URL}assets/mascot-grants.png">
+<link rel="apple-touch-icon" href="${BASE_URL}assets/mascot-grants.png">
 <meta property="og:site_name" content="${esc(SITE_NAME)}">
 <meta property="og:type" content="website">
 <meta property="og:url" content="${url}">
 <meta property="og:title" content="${title}">
 <meta property="og:description" content="${desc}">
 <meta property="og:locale" content="ja_JP">
-<meta name="twitter:card" content="summary">`;
+<meta property="og:image" content="${BASE_URL}assets/og-card.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="助成ものさし — あなたの時間を、もっと芸術へ。">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="${BASE_URL}assets/og-card.png">`;
   html = html.replace(/(<meta name="description" content="[\s\S]*?">)/, `$1\n${head}`);
   WRITTEN_PAGES.push(rel);
   const abs = join(ROOT, rel);
@@ -248,7 +281,8 @@ function write(rel, html) {
 
 // ---- トップ ----
 {
-  const openList = openPrograms.map((p) => gitem(p, '')).join('') || '<p class="note">現在受付中の制度はありません。</p>';
+  const homeOpenPrograms = openPrograms.slice(0, 12);
+  const openList = homeOpenPrograms.map((p) => gitem(p, '')).join('') || '<p class="note">現在受付中の制度はありません。</p>';
   const genreTiles = GENRES.map((g) => {
     const n = programs.filter((p) => genresOf(p).includes(g.tag)).length;
     return `<a class="tile" href="genres/${g.key}.html"><b>${g.label}</b><div class="c">${n}制度・公開中</div></a>`;
@@ -296,6 +330,7 @@ ${CHIHO.map(([label, prefs]) => `<div class="prefgroup"><div class="gh">${label}
 <div><div class="n">5</div><div class="l">ジャンル</div></div>
 <a class="stat-sister" href="${KOUBO_URL}" target="_blank" rel="noopener"><span class="stat-sister-kicker">姉妹サイト</span><span class="stat-sister-name">身体芸術・公募ものさしへ →</span></a>
 </div>
+${searchForm()}
 <p><a class="cta" href="check.html">適格性チェックを試す →</a></p>
 
 <div class="tabs" role="tablist">
@@ -307,8 +342,10 @@ ${CHIHO.map(([label, prefs]) => `<div class="prefgroup"><div class="gh">${label}
 <div class="tabpane hidden" id="tab-region">${regionPane}</div>
 <div class="tabpane hidden" id="tab-deadline">${deadlinePane}</div>
 
-<h2>いま応募できる助成（${openPrograms.length}）</h2>
+<h2>受付中の助成（${homeOpenPrograms.length}件を掲載）</h2>
+<p class="note" style="margin-top:-7px">トップでは受付中の助成を一部掲載しています。</p>
 ${openList}
+${openPrograms.length > homeOpenPrograms.length ? `<p><a class="cta" href="calendar.html">受付中の助成をすべて見る（${openPrograms.length}件）→</a></p>` : ''}
 
 <div class="discl">これは開発中のプロトタイプです。適格性の判定は募集要項の明示条件のみに基づく機械的なもので、採択可能性を示すものではありません。</div>
 <script>
@@ -319,19 +356,54 @@ b.classList.add('on');
 document.getElementById('tab-'+b.dataset.tab).classList.remove('hidden');
 };});
 </script>`;
-  write('index.html', layout({ title: `${SITE_NAME}｜文化芸術の助成金を根拠つきで探す`, desc: `文化芸術・クリエイターの助成金を、締切・助成額・支給時期・応募条件つきで探せる無料サイト。舞台芸術・音楽・美術・映像・文芸/伝統芸能の${programs.length}制度を収録。`, rel: '', active: 'home', body, extraCss: HOME_CSS }));
+  write('index.html', layout({ title: `${SITE_NAME}｜文化芸術の助成金を根拠つきで探す`, desc: `文化芸術・クリエイターの助成金を、締切・助成額・支給時期・応募条件つきで探せる無料サイト。舞台芸術・音楽・美術・映像・文芸/伝統芸能の${programs.length}制度を収録。`, rel: '', active: 'home', body, extraCss: SEARCH_CSS + HOME_CSS }));
 }
 
 // ---- 制度一覧 ----
 {
   let body = `<h1>助成金を探す（${programs.length}制度）</h1>
-<p class="lede">地域別に全制度を掲載。各制度ページで締切・助成額・支給時期・応募条件・出典を確認できます。</p>`;
+<p class="lede">地域別に全制度を掲載。各制度ページで締切・助成額・支給時期・応募条件・出典を確認できます。</p>
+${searchForm({ live: true })}
+<div class="search-empty" id="grant-search-empty" hidden>該当する助成がありません。地域名・ジャンル・条件など、言葉を短くしてお試しください。</div>`;
   for (const b of BUCKETS) {
     const list = programs.filter((p) => bucketOf(p.region).key === b.key);
     if (!list.length) continue;
-    body += `<h2>${b.label}（${list.length}）</h2>` + list.map((p) => gitem(p, '')).join('');
+    body += `<section class="search-group"><h2>${b.label}（${list.length}）</h2>${list.map((p) => gitem(p, '', true)).join('')}</section>`;
   }
-  write('grants.html', layout({ title: `助成金一覧（${programs.length}制度）｜${SITE_NAME}`, desc: `文化芸術の助成金${programs.length}制度を地域別に一覧。締切・助成額・支給時期・応募条件つき。`, rel: '', active: 'grants', body }));
+  body += `<script>
+(function(){
+var form=document.getElementById('grant-search');
+var input=document.getElementById('grant-q-live');
+var status=document.getElementById('grant-search-status');
+var empty=document.getElementById('grant-search-empty');
+var items=Array.prototype.slice.call(document.querySelectorAll('.search-group .gitem'));
+var groups=Array.prototype.slice.call(document.querySelectorAll('.search-group'));
+function norm(s){return String(s||'').normalize('NFKC').toLowerCase().trim();}
+function apply(){
+  var terms=norm(input.value).split(/\\s+/).filter(Boolean);
+  var shown=0;
+  items.forEach(function(item){
+    var hay=norm(item.getAttribute('data-search'));
+    var match=terms.every(function(term){return hay.indexOf(term)!==-1;});
+    item.hidden=!match;if(match)shown++;
+  });
+  groups.forEach(function(group){group.hidden=!group.querySelector('.gitem:not([hidden])');});
+  empty.hidden=shown!==0;
+  status.textContent=terms.length ? shown+'件見つかりました' : '${programs.length}件すべて表示しています';
+}
+var initial=new URLSearchParams(location.search).get('q')||'';
+input.value=initial;
+input.addEventListener('input',apply);
+form.addEventListener('submit',function(e){
+  e.preventDefault();
+  var url=new URL(location.href);var q=input.value.trim();
+  if(q)url.searchParams.set('q',q);else url.searchParams.delete('q');
+  history.replaceState(null,'',url.pathname+url.search+url.hash);apply();
+});
+apply();
+})();
+</script>`;
+  write('grants.html', layout({ title: `助成金一覧（${programs.length}制度）｜${SITE_NAME}`, desc: `文化芸術の助成金${programs.length}制度を地域別に一覧。締切・助成額・支給時期・応募条件つき。`, rel: '', active: 'grants', body, extraCss: SEARCH_CSS }));
 }
 
 // ---- 締切カレンダー ----
