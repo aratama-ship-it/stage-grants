@@ -266,7 +266,7 @@ ${CHIHO.map(([label, prefs]) => `<div class="prefgroup"><div class="gh">${label}
 
   const body = `
 <div class="home-hero">
-<h1>あなたに合う文化芸術の助成金を。</h1>
+<h1>あなたの時間を、もっと芸術へ。</h1>
 <p class="lede home-lede">締切・助成額・「いつ入金されるか（支給時期）」・応募条件をまとめて確認。舞台芸術・音楽・美術・映像・文芸/伝統芸能の${programs.length}制度を収録（無料）。</p>
 <div class="home-mascot"><img src="assets/mascot-grants.png" width="512" height="512" alt="芽を育てるものさしのキャラクター" fetchpriority="high" decoding="async"></div>
 </div>
@@ -387,6 +387,13 @@ write('about.html', layout({
   title: `このサイトについて｜${SITE_NAME}`, desc: `${SITE_NAME}の目的・情報源・更新方針。`, rel: '', active: 'about',
   body: `<h1>このサイトについて</h1>
 <div class="card">
+<section class="mission" aria-labelledby="mission-heading">
+<h2 id="mission-heading">あなたの時間を、もっと芸術へ。</h2>
+<p>作品をつくること。稽古を重ねること。人と出会い、観客へ届けること。文化芸術に関わる人の時間と力が、できるだけそうした営みに使われてほしい——それが、このプロジェクトで最も大切にしている思いです。</p>
+<p>一方で、助成金を探し、長い募集要項を読み、自分が対象かを確かめ、締切・必要書類・支給時期を整理する作業には、多くの時間と体力が必要です。創作を支えるはずの制度を利用するために、創作へ向ける力が削られてしまう。助成ものさしは、その負担を少しでも小さくするために生まれました。</p>
+<p>申請そのものをなくすことはできません。それでも、散らばった条件と根拠を見つけやすくし、「探す・比べる・確かめる」時間を短くすることはできます。事務作業に費やす時間を減らし、あなたの時間と力を、もっと芸術へ戻すことを目指しています。</p>
+</section>
+<h2>助成ものさしについて</h2>
 <p>${SITE_NAME}は、文化芸術・クリエイターのための助成金・補助金を、締切・助成額・「いつ入金されるか（支給時期）」・応募条件つきで探せる無料サイトです。舞台芸術・音楽・美術・映像・文芸/伝統芸能の5ジャンル、全国＋47都道府県・市区町村の${programs.length}制度を収録しています。</p>
 <p>名前の「ものさし」には、自分の活動と募集条件を照らし合わせて「応募できるか（合うか）」を測るための道具でありたい、という思いを込めています。採択を約束するのではなく、根拠となる条文とともに判断材料をお渡しします。</p>
 <h2>特徴</h2>
@@ -399,6 +406,9 @@ write('about.html', layout({
 <p>掲載情報は各助成元の公式サイト・募集要項を一次確認したものです（最終確認: ${VERIFIED}）。制度は毎年変わるため順次更新しますが、応募前には必ず各助成元の最新要項をご確認ください。</p>
 <p>掲載内容の誤り・更新のご連絡は <a href="disclaimer.html">情報訂正の窓口</a> へ。</p>
 </div>`,
+  extraCss: `.mission{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:12px;padding:16px 18px;margin:0 0 24px}
+.mission h2{margin:0 0 8px;font-size:20px;line-height:1.5;color:var(--accent)}
+.mission p{margin:9px 0}`,
 }));
 
 write('privacy.html', layout({
