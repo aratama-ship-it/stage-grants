@@ -246,7 +246,7 @@ ${CHIHO.map(([label, prefs]) => `<div class="prefgroup"><div class="gh">${label}
 
   const body = `
 <div class="home-hero">
-<h1>あなたに合う文化芸術の助成金を、根拠つきで。</h1>
+<h1>あなたに合う文化芸術の助成金を。</h1>
 <p class="lede home-lede">締切・助成額・「いつ入金されるか（支給時期）」・応募条件をまとめて確認。舞台芸術・音楽・美術・映像・文芸/伝統芸能の${programs.length}制度を収録（無料）。</p>
 <div class="home-mascot"><img src="assets/mascot-grants.png" width="512" height="512" alt="芽を育てるものさしのキャラクター" fetchpriority="high" decoding="async"></div>
 </div>
