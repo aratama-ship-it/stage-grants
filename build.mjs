@@ -10,7 +10,7 @@ const VERIFIED = '2026-07-18';
 const SITE_NAME = '助成ものさし';
 const BASE_URL = 'https://aratama-ship-it.github.io/stage-grants/'; // 独自ドメイン取得後に差し替え
 const FORM_URL = 'https://forms.gle/sX3hTrCRdipxKsmCA'; // 情報訂正・お問い合わせ Googleフォーム
-const KOUBO_URL = 'https://aratama-ship-it.github.io/art-koubo/'; // 姉妹サイト 公募ものさし
+const KOUBO_URL = 'https://aratama-ship-it.github.io/art-koubo/'; // 姉妹サイト 身体芸術公募ものさし
 // --- 解析・広告（値を入れて node build.mjs で有効化。空なら読み込まれずバナーも出ない）---
 const ANALYTICS_GA4 = '';   // 例: 'G-XXXXXXXXXX'（Google Analytics 4 の測定ID）
 const ADSENSE_CLIENT = '';  // 例: 'ca-pub-1234567890123456'（AdSense 承認後のクライアントID）
@@ -51,8 +51,22 @@ const genresOf = (p) => (Array.isArray(p.genres) && p.genres.length ? p.genres :
 const COMING = [];
 const openPrograms = programs.filter((p) => p.dlUrgent);
 
+const HOME_CSS = `
+.home-hero{display:grid;grid-template-columns:minmax(0,1fr) 188px;grid-template-rows:auto auto;align-items:center;column-gap:24px;min-height:190px;padding:4px 4px 8px 0}
+.home-hero h1{grid-column:1;grid-row:1;align-self:end;font-size:clamp(25px,3.4vw,32px);line-height:1.45;letter-spacing:-.015em;margin:10px 0 5px}
+.home-hero .home-lede{grid-column:1;grid-row:2;align-self:start;max-width:650px}
+.home-mascot{grid-column:2;grid-row:1/3;justify-self:end;width:188px;aspect-ratio:1;display:grid;place-items:center;margin:-4px 0 -8px}
+.home-mascot img{display:block;width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 8px 12px rgba(28,28,34,.09))}
+@media(max-width:640px){
+  .home-hero{grid-template-columns:minmax(0,1fr) 108px;grid-template-rows:auto auto;column-gap:8px;min-height:0;padding:2px 0 7px}
+  .home-hero h1{grid-column:1;grid-row:1;font-size:22px;line-height:1.48;margin:8px 0 4px}
+  .home-hero .home-lede{grid-column:1/3;grid-row:2;margin-top:3px}
+  .home-mascot{grid-column:2;grid-row:1;width:108px;margin:-4px 0 -5px}
+}
+@media(max-width:380px){.home-hero{grid-template-columns:minmax(0,1fr) 92px}.home-hero h1{font-size:20px}.home-mascot{width:92px}}`;
+
 // ---- 共通レイアウト ----
-function layout({ title, desc, rel, body, active }) {
+function layout({ title, desc, rel, body, active, extraCss = '' }) {
   const nav = [
     ['index.html', 'ホーム', 'home'],
     ['grants.html', '助成金を探す', 'grants'],
@@ -128,19 +142,20 @@ footer{border-top:1px solid var(--line);background:#fff;margin-top:30px}
 .pref{font-size:13px;border:1px solid var(--line);border-radius:8px;padding:6px 11px;background:#fafafb;color:#b4b6c0}
 a.pref{color:var(--accent);border-color:#d7ddf6;background:#eef0fa;font-weight:600}
 a.pref:hover{text-decoration:none;border-color:var(--accent)}
+${extraCss}
 </style>
 <script>window.__SITE_TRACKING={ga4:${JSON.stringify(ANALYTICS_GA4)},adsClient:${JSON.stringify(ADSENSE_CLIENT)},privacyUrl:${JSON.stringify(rel + 'privacy.html')}};</script>
 <script src="${rel}assets/tracking.js" defer></script>
 </head>
 <body>
-<div class="nav"><div class="nav-in"><span class="brand">${SITE_NAME}</span>${nav}<a class="sister" href="${KOUBO_URL}" target="_blank" rel="noopener">公募は「公募ものさし」へ →</a></div></div>
+<div class="nav"><div class="nav-in"><span class="brand">${SITE_NAME}</span>${nav}<a class="sister" href="${KOUBO_URL}" target="_blank" rel="noopener">公募は「身体芸術公募ものさし」へ →</a></div></div>
 <main>
 ${body}
 </main>
 <footer><div class="foot-in">
 <!-- ad-slot: フッター広告（AdSense審査後に有効化） -->
 情報は${VERIFIED}に各公式サイト・募集要項で一次確認したものです（順次更新）。締切・条件は変動します。最終判断は各助成元の最新の募集要項でご確認ください。<br>
-<a href="${rel}about.html">このサイトについて</a> ・ <a href="${rel}privacy.html">プライバシー</a> ・ <a href="${rel}disclaimer.html">免責事項・情報訂正</a> ・ <a href="${KOUBO_URL}" target="_blank" rel="noopener">姉妹サイト 公募ものさし</a>
+<a href="${rel}about.html">このサイトについて</a> ・ <a href="${rel}privacy.html">プライバシー</a> ・ <a href="${rel}disclaimer.html">免責事項・情報訂正</a> ・ <a href="${KOUBO_URL}" target="_blank" rel="noopener">姉妹サイト 身体芸術公募ものさし</a>
 </div></footer>
 </body>
 </html>`;
@@ -229,8 +244,11 @@ ${CHIHO.map(([label, prefs]) => `<div class="prefgroup"><div class="gh">${label}
 <p><a class="cta" href="calendar.html">締切カレンダー・募集状況の一覧を見る →</a></p>`;
 
   const body = `
+<div class="home-hero">
 <h1>あなたに合う文化芸術の助成金を、根拠つきで。</h1>
-<p class="lede">締切・助成額・「いつ入金されるか（支給時期）」・応募条件をまとめて確認。舞台芸術・音楽・美術・映像・文芸/伝統芸能の${programs.length}制度を収録（無料）。</p>
+<p class="lede home-lede">締切・助成額・「いつ入金されるか（支給時期）」・応募条件をまとめて確認。舞台芸術・音楽・美術・映像・文芸/伝統芸能の${programs.length}制度を収録（無料）。</p>
+<div class="home-mascot"><img src="assets/mascot-grants.png" width="512" height="512" alt="芽を育てるものさしのキャラクター" fetchpriority="high" decoding="async"></div>
+</div>
 <div class="stat">
 <div><div class="n">${programs.length}</div><div class="l">収録制度</div></div>
 <div><div class="n">${openPrograms.length}</div><div class="l">いま受付中</div></div>
@@ -259,7 +277,7 @@ b.classList.add('on');
 document.getElementById('tab-'+b.dataset.tab).classList.remove('hidden');
 };});
 </script>`;
-  write('index.html', layout({ title: `${SITE_NAME}｜文化芸術の助成金を根拠つきで探す`, desc: `文化芸術・クリエイターの助成金を、締切・助成額・支給時期・応募条件つきで探せる無料サイト。舞台芸術・音楽・美術・映像・文芸/伝統芸能の${programs.length}制度を収録。`, rel: '', active: 'home', body }));
+  write('index.html', layout({ title: `${SITE_NAME}｜文化芸術の助成金を根拠つきで探す`, desc: `文化芸術・クリエイターの助成金を、締切・助成額・支給時期・応募条件つきで探せる無料サイト。舞台芸術・音楽・美術・映像・文芸/伝統芸能の${programs.length}制度を収録。`, rel: '', active: 'home', body, extraCss: HOME_CSS }));
 }
 
 // ---- 制度一覧 ----
