@@ -11,6 +11,7 @@ const SITE_NAME = '助成ものさし';
 const BASE_URL = 'https://aratama-ship-it.github.io/stage-grants/'; // 独自ドメイン取得後に差し替え
 const FORM_URL = 'https://forms.gle/sX3hTrCRdipxKsmCA'; // 情報訂正・お問い合わせ Googleフォーム
 const KOUBO_URL = 'https://aratama-ship-it.github.io/art-koubo/'; // 姉妹サイト 身体芸術・公募ものさし
+const SAVED_KEY = 'monosashi-grants-saved-v1';
 // --- 解析・広告（値を入れて node build.mjs で有効化。空なら読み込まれずバナーも出ない）---
 const ANALYTICS_GA4 = '';   // 例: 'G-XXXXXXXXXX'（Google Analytics 4 の測定ID）
 const ADSENSE_CLIENT = '';  // 例: 'ca-pub-1234567890123456'（AdSense 承認後のクライアントID）
@@ -61,7 +62,7 @@ const SEARCH_CSS = `
 .search-help,.search-status{font-size:12px;color:var(--sub);margin:7px 0 0}
 .search-status{font-weight:600;color:var(--accent)}
 .search-empty{background:#fff;border:1px dashed var(--line);border-radius:12px;padding:18px;margin:14px 0;color:var(--sub)}
-.search-group[hidden],.gitem[hidden],.search-empty[hidden]{display:none!important}
+.search-group[hidden],.gitem-wrap[hidden],.search-empty[hidden]{display:none!important}
 @media(max-width:480px){.searchline{align-items:stretch}.searchline button{padding:0 14px}}`;
 
 const HOME_CSS = `
@@ -101,6 +102,7 @@ function layout({ title, desc, rel, body, active, extraCss = '' }) {
     ['grants.html', '助成金を探す', 'grants'],
     ['calendar.html', '締切カレンダー', 'calendar'],
     ['check.html', '適格性チェック', 'check'],
+    ['saved.html', 'あとで見る <span class="saved-count" aria-label="保存件数">0</span>', 'saved'],
     ['about.html', 'このサイトについて', 'about'],
   ].map(([href, label, key]) =>
     `<a href="${rel}${href}"${key === active ? ' class="on"' : ''}>${label}</a>`
@@ -162,6 +164,32 @@ h1{font-size:22px;margin:6px 0 6px}h2{font-size:17px;margin:26px 0 12px}
 .gitem:hover{border-color:var(--accent);text-decoration:none}
 .gitem .t{font-weight:600;color:var(--ink)}
 .gitem .m{color:var(--sub);font-size:12.5px;margin-top:2px}
+.gitem-wrap{position:relative;margin:9px 0}
+.gitem-wrap .gitem{margin:0;padding-right:58px;min-height:62px}
+.save-toggle{min-width:44px;height:44px;border:1px solid var(--accent-line);border-radius:10px;background:#fff;color:var(--accent);font:inherit;font-weight:800;cursor:pointer;line-height:1}
+.save-toggle:hover{background:var(--accent-soft)}
+.save-toggle:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.save-toggle[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:#fff}
+.save-toggle:disabled{opacity:.45;cursor:not-allowed}
+.save-card{position:absolute;top:8px;right:8px;z-index:1;font-size:21px}
+.save-inline{width:auto;padding:0 15px;margin:10px 0 2px;line-height:1.4}
+.saved-count{display:inline-grid;place-items:center;min-width:19px;height:19px;margin-left:3px;padding:0 5px;border-radius:10px;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:800;vertical-align:middle}
+.nav a.on .saved-count{background:#fff}
+.saved-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-top:16px}
+.saved-card{display:flex;flex-direction:column;background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.saved-card h2{font-size:15px;margin:0 0 4px;line-height:1.55}
+.saved-card .saved-meta{font-size:12.5px;color:var(--sub);margin:0 0 10px}
+.saved-card .saved-fields{display:grid;grid-template-columns:78px 1fr;gap:5px 9px;margin:0 0 14px;font-size:13px}
+.saved-card .saved-fields dt{color:var(--sub)}
+.saved-card .saved-fields dd{margin:0}
+.saved-actions{display:flex;gap:8px;align-items:center;margin-top:auto}
+.saved-actions a{flex:1;text-align:center;padding:8px 10px;border-radius:9px;background:var(--accent-soft);font-size:13px;font-weight:700}
+.saved-actions .save-toggle{flex:0 0 44px;padding:0}
+.saved-tools{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin:14px 0}
+.quiet-button{min-height:42px;border:1px solid var(--line);border-radius:10px;background:#fff;color:var(--sub);font:inherit;padding:8px 13px;cursor:pointer}
+.quiet-button:hover{border-color:var(--accent);color:var(--accent)}
+.saved-empty{background:#fff;border:1px dashed var(--line);border-radius:14px;padding:24px 18px;text-align:center;color:var(--sub)}
+@media(max-width:640px){.saved-grid{grid-template-columns:1fr}}
 .tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .tag{font-size:11.5px;background:#f4f5fa;color:var(--sub);border-radius:6px;padding:3px 8px}
 .tag.cash{background:var(--accent-soft);color:var(--accent);font-weight:600}
@@ -202,13 +230,23 @@ ${extraCss}
 <script>
 (()=>{const button=document.querySelector('.menu-toggle');const menu=document.getElementById('site-menu');if(!button||!menu)return;const close=(focus=false)=>{button.setAttribute('aria-expanded','false');button.setAttribute('aria-label','メニューを開く');menu.classList.remove('is-open');if(focus)button.focus()};button.addEventListener('click',()=>{const open=button.getAttribute('aria-expanded')==='true';if(open){close()}else{button.setAttribute('aria-expanded','true');button.setAttribute('aria-label','メニューを閉じる');menu.classList.add('is-open')}});document.addEventListener('keydown',event=>{if(event.key==='Escape'&&button.getAttribute('aria-expanded')==='true')close(true)});window.addEventListener('resize',()=>{if(window.innerWidth>720)close()})})();
 </script>
+<script>
+(()=>{const key=${JSON.stringify(SAVED_KEY)};let available=true;
+const read=()=>{try{const value=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(value)?value.map(String):[]}catch(error){available=false;return[]}};
+const write=(ids)=>{try{localStorage.setItem(key,JSON.stringify(Array.from(new Set(ids.map(String)))))}catch(error){available=false}sync()};
+const sync=()=>{const ids=read();document.querySelectorAll('.saved-count').forEach((node)=>{node.textContent=String(ids.length)});document.querySelectorAll('[data-save-id]').forEach((button)=>{const saved=ids.includes(String(button.dataset.saveId));const name=button.dataset.saveName||'この項目';button.disabled=!available;button.setAttribute('aria-pressed',String(saved));button.setAttribute('aria-label',saved?name+'をあとで見るから外す':name+'をあとで見るに追加');button.textContent=button.classList.contains('save-inline')?(saved?'★ 保存済み':'☆ あとで見る'):(saved?'★':'☆')})};
+const toggle=(id)=>{const ids=read();const value=String(id);write(ids.includes(value)?ids.filter((x)=>x!==value):[...ids,value]);window.dispatchEvent(new CustomEvent('monosashi:saved'))};
+document.addEventListener('click',(event)=>{const button=event.target.closest('[data-save-id]');if(!button||button.disabled)return;event.preventDefault();toggle(button.dataset.saveId)});
+window.addEventListener('storage',(event)=>{if(event.key===key)sync()});window.addEventListener('monosashi:saved',sync);window.MonosashiSaved={get:read,set:write,toggle,sync};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',sync);else sync()})();
+</script>
 <main>
 ${body}
 </main>
 <footer><div class="foot-in">
 <!-- ad-slot: フッター広告（AdSense審査後に有効化） -->
 情報は${VERIFIED}に各公式サイト・募集要項で一次確認したものです（順次更新）。締切・条件は変動します。最終判断は各助成元の最新の募集要項でご確認ください。<br>
-<a href="${rel}about.html">このサイトについて</a> ・ <a href="${rel}privacy.html">プライバシー</a> ・ <a href="${rel}disclaimer.html">免責事項・情報訂正</a> ・ <a href="${KOUBO_URL}" target="_blank" rel="noopener">姉妹サイト 身体芸術・公募ものさし</a>
+<a href="${rel}about.html">このサイトについて</a> ・ <a href="${rel}saved.html">あとで見る</a> ・ <a href="${rel}privacy.html">プライバシー</a> ・ <a href="${rel}disclaimer.html">免責事項・情報訂正</a> ・ <a href="${KOUBO_URL}" target="_blank" rel="noopener">姉妹サイト 身体芸術・公募ものさし</a>
 </div></footer>
 </body>
 </html>`;
@@ -236,10 +274,11 @@ function searchTextOf(p) {
     ...(p.conditions || []), ...genresOf(p)].filter(Boolean).join(' ');
 }
 function gitem(p, rel, searchable = false) {
-  return `<a class="gitem"${searchable ? ` data-search="${esc(searchTextOf(p))}"` : ''} href="${rel}grants/${p.id}.html">
+  return `<div class="gitem-wrap"${searchable ? ` data-search="${esc(searchTextOf(p))}"` : ''}><a class="gitem" href="${rel}grants/${p.id}.html">
 <div class="t">${esc(p.name)}</div>
 <div class="m">${esc(p.funder)} ・ ${esc(p.region)}</div>
-<div class="tags">${statusTags(p)}</div></a>`;
+<div class="tags">${statusTags(p)}</div></a>
+<button class="save-toggle save-card" type="button" data-save-id="${esc(p.id)}" data-save-name="${esc(p.name)}" aria-pressed="false">☆</button></div>`;
 }
 
 function searchForm({ action = 'grants.html', live = false } = {}) {
@@ -376,7 +415,7 @@ var form=document.getElementById('grant-search');
 var input=document.getElementById('grant-q-live');
 var status=document.getElementById('grant-search-status');
 var empty=document.getElementById('grant-search-empty');
-var items=Array.prototype.slice.call(document.querySelectorAll('.search-group .gitem'));
+var items=Array.prototype.slice.call(document.querySelectorAll('.search-group .gitem-wrap'));
 var groups=Array.prototype.slice.call(document.querySelectorAll('.search-group'));
 function norm(s){return String(s||'').normalize('NFKC').toLowerCase().trim();}
 function apply(){
@@ -387,7 +426,7 @@ function apply(){
     var match=terms.every(function(term){return hay.indexOf(term)!==-1;});
     item.hidden=!match;if(match)shown++;
   });
-  groups.forEach(function(group){group.hidden=!group.querySelector('.gitem:not([hidden])');});
+  groups.forEach(function(group){group.hidden=!group.querySelector('.gitem-wrap:not([hidden])');});
   empty.hidden=shown!==0;
   status.textContent=terms.length ? shown+'件見つかりました' : '${programs.length}件すべて表示しています';
 }
@@ -457,6 +496,7 @@ for (const p of programs) {
 <h1>${esc(p.name)}</h1>
 <p class="lede">${esc(p.funder)} ・ ${esc(p.region)}</p>
 <div class="tags">${statusTags(p)}</div>
+<button class="save-toggle save-inline" type="button" data-save-id="${esc(p.id)}" data-save-name="${esc(p.name)}" aria-pressed="false">☆ あとで見る</button>
 <div class="card">
 <div class="kv"><div class="k">受付状態（本サイトの機械判定）</div><div class="v">${recruitStatus(p).label}</div></div>
 <div class="kv"><div class="k">受付状況・締切</div><div class="v">${esc(p.deadline)}</div></div>
@@ -473,6 +513,28 @@ ${p.funderQ ? `<div class="qbox"><b>助成元への確認事項</b><br>${esc(p.f
 ${related.length ? `<h2>同じ助成元の他の制度</h2>${related.map((q) => gitem(q, '../')).join('')}` : ''}
 <div class="discl">判定・掲載情報は募集要項の明示内容に基づく参考情報で、採択可能性や最終的な適格性を保証するものではありません。応募前に必ず公式の最新要項をご確認ください。</div>`;
   write(`grants/${p.id}.html`, layout({ title: `${esc(p.name)}｜${esc(p.funder)}の助成金｜${SITE_NAME}`, desc: `${esc(p.funder)}「${esc(p.name)}」。${esc(p.region)}／${esc(p.amount)}／支給:${esc(p.cashflow)}。締切・応募条件・出典を掲載。`, rel: '../', active: 'grants', body }));
+}
+
+// ---- あとで見る・比較 ----
+{
+  const savedData = JSON.stringify(programs.map((p) => ({
+    id: String(p.id), name: p.name, funder: p.funder, region: p.region,
+    deadline: p.deadline, amount: p.amount, cashflow: p.cashflow,
+  }))).replace(/</g, '\\u003c');
+  const body = `<h1>あとで見る・比較</h1>
+<p class="lede">気になる助成を一時保存し、締切・助成額・支給時期を横に並べて比べられます。</p>
+<div class="discl">保存先はこの端末のブラウザ内だけです。内容は本サイトのサーバーへ送信されません。ブラウザのサイトデータを削除すると保存も消えます。</div>
+<div class="saved-tools"><p class="note" id="saved-summary" aria-live="polite">保存した助成を読み込んでいます。</p><button class="quiet-button" id="saved-clear" type="button">すべて外す</button></div>
+<div class="saved-empty" id="saved-empty" hidden>まだ保存した助成はありません。<br><a href="grants.html">助成金一覧</a>の☆を押すと、ここで比較できます。</div>
+<div class="saved-grid" id="saved-list"></div>
+<script type="application/json" id="saved-data">${savedData}</script>
+<script>
+(()=>{const records=JSON.parse(document.getElementById('saved-data').textContent);const byId=new Map(records.map((item)=>[String(item.id),item]));const list=document.getElementById('saved-list');const empty=document.getElementById('saved-empty');const summary=document.getElementById('saved-summary');const clear=document.getElementById('saved-clear');
+const escapeHtml=(value)=>String(value??'').replace(/[&<>\"]/g,(char)=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[char]));
+function render(){const ids=window.MonosashiSaved.get();const items=ids.map((id)=>byId.get(String(id))).filter(Boolean);summary.textContent=items.length?items.length+'件を保存しています':'保存は0件です';empty.hidden=items.length!==0;clear.hidden=items.length===0;list.innerHTML=items.map((item)=>'<article class="saved-card"><h2><a href="grants/'+escapeHtml(item.id)+'.html">'+escapeHtml(item.name)+'</a></h2><p class="saved-meta">'+escapeHtml(item.funder)+' ・ '+escapeHtml(item.region)+'</p><dl class="saved-fields"><dt>締切</dt><dd>'+escapeHtml(item.deadline)+'</dd><dt>助成額</dt><dd>'+escapeHtml(item.amount)+'</dd><dt>支給時期</dt><dd>'+escapeHtml(item.cashflow)+'</dd></dl><div class="saved-actions"><a href="grants/'+escapeHtml(item.id)+'.html">詳細を見る</a><button class="save-toggle" type="button" data-save-id="'+escapeHtml(item.id)+'" data-save-name="'+escapeHtml(item.name)+'" aria-pressed="true">★</button></div></article>').join('');window.MonosashiSaved.sync()}
+clear.addEventListener('click',()=>{window.MonosashiSaved.set([]);window.dispatchEvent(new CustomEvent('monosashi:saved'))});window.addEventListener('monosashi:saved',render);render()})();
+</script>`;
+  write('saved.html', layout({ title: `あとで見る・比較｜${SITE_NAME}`, desc: `気になる文化芸術助成を端末内に保存し、締切・助成額・支給時期を比較できます。`, rel: '', active: 'saved', body }));
 }
 
 // ---- ポリシー系 ----
@@ -515,6 +577,8 @@ write('privacy.html', layout({
 <p>本サイトは運営費のためにディスプレイ広告（Google AdSense 等）を掲載する場合があります。広告の配信にはCookie等が利用され、上記のとおり同意した場合にのみ読み込まれます。広告の内容・配信は配信事業者により行われ、助成情報の掲載内容や適格性の判定結果・並び順に影響することはありません。（本サイトでは商用サービスへのアフィリエイト送客は行いません。）</p>
 <h2>適格性チェックの入力内容について</h2>
 <p>適格性チェックツールに入力いただいた条件（拠点・分野・実績など）は、<strong>お使いのブラウザ内でのみ処理され、本サイトのサーバーや第三者に送信されることはありません</strong>。ページを閉じると入力内容は破棄されます。</p>
+<h2>「あとで見る」の保存内容について</h2>
+<p>「あとで見る」で選んだ制度の識別情報は、お使いのブラウザのlocalStorageにのみ保存され、本サイトのサーバーや第三者には送信されません。ブラウザのサイトデータを削除すると保存内容も消去されます。</p>
 <h2>個人情報</h2>
 <p>本サイトはお問い合わせ等でいただいた個人情報を、対応の目的以外に利用しません。第三者への提供は法令に基づく場合を除き行いません。</p>
 <p>お問い合わせ・訂正のご連絡は <a href="disclaimer.html">情報訂正の窓口</a> へ。</p>
