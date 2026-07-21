@@ -51,6 +51,7 @@
     .nav-links.is-open{display:flex}
     .nav .nav-links a{display:block;width:100%;padding:11px 12px;font-size:14px}
     .nav .nav-links .sister{margin:4px 0 0}
+    .source-notice{grid-template-columns:1fr;gap:2px;padding:11px 12px}
     .beta-notice{grid-template-columns:1fr;gap:1px;padding:10px 12px}
   }
   @media(prefers-reduced-motion:reduce){.menu-toggle .bar{transition:none}}
@@ -60,6 +61,8 @@
   .proto-tag{display:inline-block;font-size:11px;color:var(--accent);border:1px solid var(--accent);
     border-radius:20px;padding:1px 9px;margin-top:8px;font-weight:600}
   main{max-width:760px;margin:0 auto;padding:0 14px}
+  .source-notice{display:grid;grid-template-columns:132px minmax(0,1fr);gap:7px 16px;align-items:start;margin:0 0 18px;padding:12px 14px;border:1px solid var(--accent-line);border-left:4px solid var(--accent);border-radius:11px;background:var(--accent-soft);color:var(--sub);font-size:13px;line-height:1.65}
+  .source-notice strong{color:var(--accent);font-size:13px;letter-spacing:.04em}
   .beta-notice{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 12px;align-items:baseline;margin:0 0 18px;padding:10px 14px;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;background:var(--card);color:var(--sub);font-size:13px;line-height:1.65}
   .beta-notice__label{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:.1em}.beta-notice p{margin:0}.beta-notice a{color:var(--accent);font-weight:800;text-decoration-thickness:1.5px;text-underline-offset:2px}
   .card{background:var(--card);border-radius:16px;box-shadow:var(--shadow);padding:18px;margin:14px 0}
@@ -143,6 +146,7 @@
 </header>
 
 <main>
+  <aside class="source-notice" aria-label="掲載情報について"><strong>掲載情報について</strong><span>掲載情報は、主催者等の一次情報をもとに収集・整理しています。更新のタイミングにより、最新の情報と異なる場合があります。詳細・最新情報は、必ず各公式サイトでご確認ください。</span></aside>
   <aside class="beta-notice" aria-label="ベータ版について"><span class="beta-notice__label">BETA</span><p><strong>このウェブサイトは現在ベータ版です。</strong> ご要望・ご意見、掲載情報の訂正などがありましたら、<a href="https://docs.google.com/forms/d/e/1FAIpQLSc1pPGdqvVjMyocYNT7q-4JcVkn-c7c__ef1cveCDZ1Jf6hAQ/viewform" target="_blank" rel="noopener">フォーム</a>よりご連絡いただけると幸いです。</p></aside>
   <!-- 入力 -->
   <div id="form">

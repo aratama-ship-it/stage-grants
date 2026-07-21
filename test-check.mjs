@@ -12,10 +12,13 @@ const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m
 const code = scripts.join('\n') + '\nglobalThis.__test = { get ALL_PROGRAMS() { return ALL_PROGRAMS; }, assess, genericRulesFor };';
 
 // 最小限のDOMスタブ
-const el = () => ({ innerHTML: '', value: '', options: [], classList: { toggle() {}, add() {}, remove() {} }, dataset: {}, onclick: null });
+const el = () => ({
+  innerHTML: '', value: '', options: [], classList: { toggle() {}, add() {}, remove() {} }, dataset: {}, onclick: null,
+  addEventListener() {}, setAttribute() {}, getAttribute() { return 'false'; }, focus() {},
+});
 const sandbox = {
-  document: { getElementById: () => el(), querySelectorAll: () => [], querySelector: () => el() },
-  window: { scrollTo() {} },
+  document: { getElementById: () => el(), querySelectorAll: () => [], querySelector: () => el(), addEventListener() {} },
+  window: { scrollTo() {}, addEventListener() {}, innerWidth: 1024 },
   fetch: () => Promise.resolve({ json: () => Promise.resolve(data) }),
   console,
 };
