@@ -26,6 +26,7 @@
     --chk:#b7791f; --chk-bg:#fbf3e2; --shadow:0 1px 3px rgba(20,20,40,.06),0 8px 24px rgba(20,20,40,.05);
   }
   *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html{scrollbar-gutter:stable}
   body{margin:0;background:var(--bg);color:var(--ink);
     font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Noto Sans JP",sans-serif;
     line-height:1.6;font-size:15px;padding-bottom:60px}
@@ -40,7 +41,7 @@
   .menu-toggle[aria-expanded="true"] .bar:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
   .menu-toggle:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
   .nav a{padding:6px 10px;border-radius:8px;font-size:13.5px;color:var(--sub);text-decoration:none;white-space:nowrap}
-  .nav a.on{background:var(--accent-soft);color:var(--accent);font-weight:600}
+  .nav a.on{background:var(--accent-soft);color:var(--accent)}
   .saved-count{display:inline-grid;place-items:center;min-width:19px;height:19px;margin-left:3px;padding:0 5px;border-radius:10px;background:var(--accent-soft);color:var(--accent);font-size:11px;font-weight:800;vertical-align:middle}
   @media(max-width:900px){
     .nav-in{padding:7px 12px;gap:8px;flex-wrap:wrap}
@@ -53,12 +54,12 @@
     .beta-notice{grid-template-columns:1fr;gap:1px;padding:10px 12px}
   }
   @media(prefers-reduced-motion:reduce){.menu-toggle .bar{transition:none}}
-  header{padding:22px 18px 14px;max-width:760px;margin:0 auto}
+  header{padding:22px 18px 14px;max-width:900px;margin:0 auto}
   h1{font-size:19px;margin:0 0 4px;letter-spacing:.01em}
   .lede{color:var(--sub);font-size:13px;margin:0}
   .proto-tag{display:inline-block;font-size:11px;color:var(--accent);border:1px solid var(--accent);
     border-radius:20px;padding:1px 9px;margin-top:8px;font-weight:600}
-  main{max-width:760px;margin:0 auto;padding:0 14px}
+  main{max-width:900px;margin:0 auto;padding:0 14px}
   .source-notice{display:grid;grid-template-columns:132px minmax(0,1fr);gap:7px 16px;align-items:start;margin:0 0 18px;padding:12px 14px;border:1px solid var(--accent-line);border-left:4px solid var(--accent);border-radius:11px;background:var(--accent-soft);color:var(--sub);font-size:13px;line-height:1.65}
   .source-notice strong{color:var(--accent);font-size:13px;letter-spacing:.04em}
   .beta-notice{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 12px;align-items:baseline;margin:0 0 18px;padding:10px 14px;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;background:var(--card);color:var(--sub);font-size:13px;line-height:1.65}
@@ -124,7 +125,7 @@
   .src a:hover{text-decoration:underline}
   .verified{font-size:11px;color:var(--sub);margin-top:6px}
   .disclaimer{font-size:11.5px;color:var(--sub);background:#fff;border-radius:12px;padding:12px 14px;margin:14px 0;border:1px dashed var(--line)}
-  footer{max-width:760px;margin:22px auto 0;padding:0 18px;font-size:11px;color:var(--sub);text-align:center}
+  footer{max-width:900px;margin:22px auto 0;padding:0 18px;font-size:11px;color:var(--sub);text-align:center}
 </style>
 <script>window.__SITE_TRACKING={ga4:"",adsClient:"",privacyUrl:"privacy.html"};</script>
 <script src="assets/tracking.js" defer></script>
