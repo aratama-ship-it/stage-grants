@@ -55,6 +55,9 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 main{max-width:900px;margin:0 auto;padding:18px 14px 60px}
 h1{font-size:22px;margin:6px 0 6px}h2{font-size:17px;margin:26px 0 12px}
 .lede{color:var(--sub);margin:0 0 6px}
+.source-notice{display:grid;grid-template-columns:132px minmax(0,1fr);gap:7px 16px;align-items:start;margin:0 0 18px;padding:12px 14px;border:1px solid var(--accent-line);border-left:4px solid var(--accent);border-radius:11px;background:var(--accent-soft);color:var(--sub);font-size:13px;line-height:1.65}
+.source-notice strong{color:var(--accent);font-size:13px;letter-spacing:.04em}
+@media(max-width:640px){.source-notice{grid-template-columns:1fr;gap:2px;padding:11px 12px}}
 .card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;margin:12px 0}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
@@ -144,6 +147,7 @@ window.addEventListener('storage',(event)=>{if(event.key===key)sync()});window.a
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',sync);else sync()})();
 </script>
 <main>
+<aside class="source-notice" aria-label="掲載情報について"><strong>掲載情報について</strong><span>掲載情報は、主催者等の一次情報をもとに収集・整理しています。更新のタイミングにより、最新の情報と異なる場合があります。詳細・最新情報は、必ず各公式サイトでご確認ください。</span></aside>
 <p class="note"><a href="../grants.html">助成金一覧</a> ／ <a href="../regions/saitama.html">埼玉</a> ／ <a href="../genres/butai.html">舞台芸術（演劇・舞踊・サーカス）</a> ・ <a href="../genres/ongaku.html">音楽</a> ・ <a href="../genres/bijutsu.html">美術・現代アート</a> ・ <a href="../genres/eizo.html">映像・映画</a> ・ <a href="../genres/bungei.html">文芸・伝統芸能ほか</a></p>
 <h1>熊谷市文化振興基金助成対象事業</h1>
 <p class="lede">熊谷市（社会教育課） ・ 埼玉県熊谷市</p>
@@ -158,7 +162,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <p class="note">ℹ️ 熊谷市文化振興基金を活用した助成。前年度実績では4/1〜7/31募集・上限20万円。最新年度の要綱・対象者区分・支払方式は要確認。※別に民間の「熊谷正寿文化財団」の芸術助成（美術中心・別枠）も存在。</p>
 
 <div class="src">📄 出典: <a href="https://www.city.kumagaya.lg.jp/kurashi/service/hojyojyoseikin/index.html" target="_blank" rel="noopener">熊谷市（社会教育課） 公式ページ</a></div>
-<p class="verified">最終確認: 2026-07-18（募集要項で一次確認）</p>
+<p class="verified">掲載情報は更新のタイミングにより、最新の募集状況と異なる場合があります。応募前に必ず公式の最新要項をご確認ください。</p>
 </div>
 <p><a class="cta" href="../check.html">この条件で適格性をチェックする →</a></p>
 <!-- ad-slot: 記事内広告。ADSENSE_CLIENT 設定時に自動広告で配信（同意後のみ） -->
@@ -167,7 +171,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </main>
 <footer><div class="foot-in">
 <!-- ad-slot: フッター広告（AdSense審査後に有効化） -->
-情報は2026-07-18に各公式サイト・募集要項で一次確認したものです（順次更新）。締切・条件は変動します。最終判断は各助成元の最新の募集要項でご確認ください。<br>
+掲載情報の更新には時間差があります。締切・条件は変動するため、最終判断は各助成元の最新の募集要項でご確認ください。<br>
 <a href="../about.html">このサイトについて</a> ・ <a href="../saved.html">あとで見る</a> ・ <a href="../privacy.html">プライバシー</a> ・ <a href="../disclaimer.html">免責事項・情報訂正</a> ・ <a href="https://aratama-ship-it.github.io/art-koubo/" target="_blank" rel="noopener">姉妹サイト 身体芸術・公募ものさし</a>
 </div></footer>
 </body>

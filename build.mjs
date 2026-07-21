@@ -152,6 +152,9 @@ a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
 main{max-width:900px;margin:0 auto;padding:18px 14px 60px}
 h1{font-size:22px;margin:6px 0 6px}h2{font-size:17px;margin:26px 0 12px}
 .lede{color:var(--sub);margin:0 0 6px}
+.source-notice{display:grid;grid-template-columns:132px minmax(0,1fr);gap:7px 16px;align-items:start;margin:0 0 18px;padding:12px 14px;border:1px solid var(--accent-line);border-left:4px solid var(--accent);border-radius:11px;background:var(--accent-soft);color:var(--sub);font-size:13px;line-height:1.65}
+.source-notice strong{color:var(--accent);font-size:13px;letter-spacing:.04em}
+@media(max-width:640px){.source-notice{grid-template-columns:1fr;gap:2px;padding:11px 12px}}
 .card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;margin:12px 0}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
@@ -241,11 +244,12 @@ window.addEventListener('storage',(event)=>{if(event.key===key)sync()});window.a
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',sync);else sync()})();
 </script>
 <main>
+<aside class="source-notice" aria-label="掲載情報について"><strong>掲載情報について</strong><span>掲載情報は、主催者等の一次情報をもとに収集・整理しています。更新のタイミングにより、最新の情報と異なる場合があります。詳細・最新情報は、必ず各公式サイトでご確認ください。</span></aside>
 ${body}
 </main>
 <footer><div class="foot-in">
 <!-- ad-slot: フッター広告（AdSense審査後に有効化） -->
-情報は${VERIFIED}に各公式サイト・募集要項で一次確認したものです（順次更新）。締切・条件は変動します。最終判断は各助成元の最新の募集要項でご確認ください。<br>
+掲載情報の更新には時間差があります。締切・条件は変動するため、最終判断は各助成元の最新の募集要項でご確認ください。<br>
 <a href="${rel}about.html">このサイトについて</a> ・ <a href="${rel}saved.html">あとで見る</a> ・ <a href="${rel}privacy.html">プライバシー</a> ・ <a href="${rel}disclaimer.html">免責事項・情報訂正</a> ・ <a href="${KOUBO_URL}" target="_blank" rel="noopener">姉妹サイト 身体芸術・公募ものさし</a>
 </div></footer>
 </body>
@@ -506,7 +510,7 @@ for (const p of programs) {
 ${p.note ? `<p class="note">ℹ️ ${esc(p.note)}</p>` : ''}
 ${p.funderQ ? `<div class="qbox"><b>助成元への確認事項</b><br>${esc(p.funderQ)}</div>` : ''}
 <div class="src">📄 出典: <a href="${esc(p.src)}" target="_blank" rel="noopener">${esc(p.funder)} 公式ページ</a></div>
-<p class="verified">最終確認: ${VERIFIED}（募集要項で一次確認）</p>
+<p class="verified">掲載情報は更新のタイミングにより、最新の募集状況と異なる場合があります。応募前に必ず公式の最新要項をご確認ください。</p>
 </div>
 <p><a class="cta" href="../check.html">この条件で適格性をチェックする →</a></p>
 <!-- ad-slot: 記事内広告。ADSENSE_CLIENT 設定時に自動広告で配信（同意後のみ） -->
@@ -555,10 +559,10 @@ write('about.html', layout({
 <ul>
 <li>単なる一覧ではなく、応募条件を根拠つきで示し、適格性チェック機能で「自分が合うか」を確認できます。</li>
 <li>舞台芸術の資金繰りに直結する「支給時期（前払い／概算払い／精算払い）」を第一級の情報として掲載しています。</li>
-<li>各制度に出典（公式ページ）と最終確認日を明記しています。</li>
+<li>各制度に出典（公式ページ）を明記し、募集要項の条件を整理しています。</li>
 </ul>
 <h2>情報源と更新</h2>
-<p>掲載情報は各助成元の公式サイト・募集要項を一次確認したものです（最終確認: ${VERIFIED}）。制度は毎年変わるため順次更新しますが、応募前には必ず各助成元の最新要項をご確認ください。</p>
+<p>掲載情報は各助成元の公式サイト・募集要項をもとに収集・整理しています。制度は毎年変わり、更新には時間差があります。応募前には必ず各助成元の最新要項をご確認ください。</p>
 <p>掲載内容の誤り・更新のご連絡は <a href="disclaimer.html">情報訂正の窓口</a> へ。</p>
 </div>`,
   extraCss: `.mission{background:var(--accent-soft);border-left:4px solid var(--accent);border-radius:12px;padding:16px 18px;margin:0 0 24px}
