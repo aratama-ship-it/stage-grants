@@ -8,9 +8,9 @@ import { fileURLToPath } from 'node:url';
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const VERIFIED = '2026-07-18';
 const SITE_NAME = '助成ものさし';
-const BASE_URL = 'https://aratama-ship-it.github.io/stage-grants/'; // 独自ドメイン取得後に差し替え
+const BASE_URL = 'https://joseikin.art-monosashi.com/';
 const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSc1pPGdqvVjMyocYNT7q-4JcVkn-c7c__ef1cveCDZ1Jf6hAQ/viewform'; // ご意見・情報訂正 共通フォーム
-const KOUBO_URL = 'https://aratama-ship-it.github.io/art-koubo/'; // 姉妹サイト 身体芸術・公募ものさし
+const KOUBO_URL = 'https://koubo.art-monosashi.com/'; // 姉妹サイト 身体芸術・公募ものさし
 const SAVED_KEY = 'monosashi-grants-saved-v1';
 // --- 解析・広告（値を入れて node build.mjs で有効化。空なら読み込まれずバナーも出ない）---
 const ANALYTICS_GA4 = '';   // 例: 'G-XXXXXXXXXX'（Google Analytics 4 の測定ID）
