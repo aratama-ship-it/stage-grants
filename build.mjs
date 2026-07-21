@@ -9,7 +9,7 @@ const ROOT = dirname(fileURLToPath(import.meta.url));
 const VERIFIED = '2026-07-18';
 const SITE_NAME = '助成ものさし';
 const BASE_URL = 'https://aratama-ship-it.github.io/stage-grants/'; // 独自ドメイン取得後に差し替え
-const FORM_URL = 'https://forms.gle/sX3hTrCRdipxKsmCA'; // 情報訂正・お問い合わせ Googleフォーム
+const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSc1pPGdqvVjMyocYNT7q-4JcVkn-c7c__ef1cveCDZ1Jf6hAQ/viewform'; // ご意見・情報訂正 共通フォーム
 const KOUBO_URL = 'https://aratama-ship-it.github.io/art-koubo/'; // 姉妹サイト 身体芸術・公募ものさし
 const SAVED_KEY = 'monosashi-grants-saved-v1';
 // --- 解析・広告（値を入れて node build.mjs で有効化。空なら読み込まれずバナーも出ない）---
@@ -149,7 +149,9 @@ h1{font-size:22px;margin:6px 0 6px}h2{font-size:17px;margin:26px 0 12px}
 .lede{color:var(--sub);margin:0 0 6px}
 .source-notice{display:grid;grid-template-columns:132px minmax(0,1fr);gap:7px 16px;align-items:start;margin:0 0 18px;padding:12px 14px;border:1px solid var(--accent-line);border-left:4px solid var(--accent);border-radius:11px;background:var(--accent-soft);color:var(--sub);font-size:13px;line-height:1.65}
 .source-notice strong{color:var(--accent);font-size:13px;letter-spacing:.04em}
-@media(max-width:640px){.source-notice{grid-template-columns:1fr;gap:2px;padding:11px 12px}}
+.beta-notice{display:grid;grid-template-columns:auto minmax(0,1fr);gap:8px 12px;align-items:baseline;margin:0 0 18px;padding:10px 14px;border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;background:var(--card);color:var(--sub);font-size:13px;line-height:1.65}
+.beta-notice__label{color:var(--accent);font-size:11px;font-weight:800;letter-spacing:.1em}.beta-notice p{margin:0}.beta-notice a{color:var(--accent);font-weight:800;text-decoration-thickness:1.5px;text-underline-offset:2px}
+@media(max-width:640px){.source-notice{grid-template-columns:1fr;gap:2px;padding:11px 12px}.beta-notice{grid-template-columns:1fr;gap:1px;padding:10px 12px}}
 .card{background:var(--card);border-radius:14px;box-shadow:var(--shadow);padding:16px 18px;margin:12px 0}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}
 .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
@@ -240,6 +242,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </script>
 <main>
 <aside class="source-notice" aria-label="掲載情報について"><strong>掲載情報について</strong><span>掲載情報は、主催者等の一次情報をもとに収集・整理しています。更新のタイミングにより、最新の情報と異なる場合があります。詳細・最新情報は、必ず各公式サイトでご確認ください。</span></aside>
+<aside class="beta-notice" aria-label="ベータ版について"><span class="beta-notice__label">BETA</span><p><strong>このウェブサイトは現在ベータ版です。</strong> ご要望・ご意見、掲載情報の訂正などがありましたら、<a href="${FORM_URL}" target="_blank" rel="noopener">フォーム</a>よりご連絡いただけると幸いです。</p></aside>
 ${body}
 </main>
 <footer><div class="foot-in">
@@ -591,8 +594,8 @@ write('disclaimer.html', layout({
 <h2>免責</h2>
 <p>本サイトの掲載情報および適格性チェックの結果は、募集要項の明示内容に基づく参考情報です。「適格」ではなく「条件上、該当の可能性がある」ことを示すもので、採択可能性・最終的な適格性を保証しません。応募の最終判断は必ず各助成元の最新の募集要項でご確認ください。締切・金額・条件は変動します。</p>
 <h2>情報訂正の窓口</h2>
-<p>掲載内容の誤り・古い情報にお気づきの場合、また掲載制度に関するご連絡は、下記までお寄せください。確認のうえ速やかに修正します。</p>
-<p><a class="cta" href="${FORM_URL}" target="_blank" rel="noopener">情報訂正・お問い合わせフォームを開く →</a></p>
+<p>掲載内容の誤り・古い情報にお気づきの場合、また掲載制度に関するご連絡、ご要望・ご意見は下記フォームへお寄せください。確認のうえ速やかに修正します。</p>
+<p><a class="cta" href="${FORM_URL}" target="_blank" rel="noopener">ご意見・情報訂正フォームを開く →</a></p>
 <p class="note">匿名で送信できます。返信をご希望の場合のみ、フォーム内でメールアドレスをご記入ください。入力内容は運営者のみが確認します。</p>
 <h2>更新履歴</h2>
 <ul>
