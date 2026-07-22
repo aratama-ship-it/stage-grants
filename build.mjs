@@ -205,6 +205,7 @@ ul.cond li:first-child{border-top:none}
 .note{color:var(--sub);font-size:13px;margin-top:8px}
 .src{margin-top:12px;font-size:13px}
 .verified{color:var(--sub);font-size:12px;margin-top:6px}
+.verified.fresh{display:inline-block;background:#f0f8f2;border:1px solid #b9dcc2;border-radius:7px;color:#2c6840;padding:6px 9px;font-weight:650}
 .discl{font-size:12px;color:var(--sub);background:#fff;border:1px dashed var(--line);border-radius:10px;padding:11px 13px;margin:16px 0}
 footer{border-top:1px solid var(--line);background:#fff;margin-top:30px}
 .foot-in{max-width:900px;margin:0 auto;padding:18px 14px;font-size:12px;color:var(--sub)}
@@ -258,7 +259,7 @@ ${body}
 // 受付状態を締切テキストから機械判定（不確実なものは「要確認」に倒す）
 function recruitStatus(p) {
   const t = p.deadline || '';
-  if (p.dlUrgent || /受付中|募集中|随時|通年/.test(t)) return { label: '受付中・随時', cls: 'ok' };
+  if (p.dlUrgent || /受付中|募集中|随時|通年/.test(t)) return { label: '受付中', cls: 'ok' };
   if (/締切済み|締め?切(り)?済|終了|募集は終了/.test(t)) return { label: '募集期間外（次回情報は未確認）', cls: '' };
   return { label: '募集時期は要確認', cls: '' };
 }
@@ -509,6 +510,7 @@ for (const p of programs) {
 ${p.note ? `<p class="note">ℹ️ ${esc(p.note)}</p>` : ''}
 ${p.funderQ ? `<div class="qbox"><b>助成元への確認事項</b><br>${esc(p.funderQ)}</div>` : ''}
 <div class="src">📄 出典: <a href="${esc(p.src)}" target="_blank" rel="noopener">${esc(p.funder)} 公式ページ</a></div>
+${p.verified ? `<p class="verified fresh">✓ 最終確認：${esc(p.verified)}（${esc(p.verificationSource || '主催者公式ページ')}）</p>` : ''}
 <p class="verified">掲載情報は更新のタイミングにより、最新の募集状況と異なる場合があります。応募前に必ず公式の最新要項をご確認ください。</p>
 </div>
 <p><a class="cta" href="../check.html">この条件で適格性をチェックする →</a></p>

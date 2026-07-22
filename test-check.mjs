@@ -41,6 +41,8 @@ const t = (name, cond) => { if (cond) console.log('  ✓ ' + name); else { conso
 
 console.log('1. 全件ロード');
 t('ALL_PROGRAMS が全件と一致', ALL_PROGRAMS.length === data.length);
+t('最終確認日は YYYY-MM-DD 形式', data.every((p) => !p.verified || /^\d{4}-\d{2}-\d{2}$/.test(p.verified)));
+t('最終確認済み案件には確認元がある', data.every((p) => !p.verified || Boolean(p.verificationSource)));
 
 console.log('2. 全制度×代表プロファイルでエラーなく判定できる');
 const profiles = [profile(), profile({ applicantKind: 'individual', genres: ['美術'] }), profile({ prefecture: '三重県', city: '津市', genres: ['文芸・伝統芸能'] }), profile({ prefecture: '愛媛県', city: '松山市', genres: ['音楽', '映像'] })];
