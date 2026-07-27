@@ -15,6 +15,7 @@ const SAVED_KEY = 'monosashi-grants-saved-v1';
 // --- 解析・広告（値を入れて node build.mjs で有効化。空なら読み込まれずバナーも出ない）---
 const ANALYTICS_GA4 = '';   // 例: 'G-XXXXXXXXXX'（Google Analytics 4 の測定ID）
 const ADSENSE_CLIENT = '';  // 例: 'ca-pub-1234567890123456'（AdSense 承認後のクライアントID）
+const CLOUDFLARE_WEB_ANALYTICS_TOKEN = '60f90222d9c947fc95e2c02c9dea472c'; // GitHub Pages配信用の手動ビーコン
 const programs = JSON.parse(readFileSync(join(ROOT, 'data/programs.data.json'), 'utf8'));
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -114,6 +115,7 @@ function layout({ title, desc, rel, body, active, extraCss = '' }) {
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
+<script type="module" src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"token":"${CLOUDFLARE_WEB_ANALYTICS_TOKEN}"}'></script>
 <style>
 :root{--bg:#f2f3f7;--card:#fff;--ink:#1c1c22;--sub:#6a6d7a;--line:#e4e5ec;--accent:#2f6f4e;
 --accent-soft:#e8f2ec;--accent-line:#c9ded1;--sister:#3355e0;--sister-bg:#eef3ff;
