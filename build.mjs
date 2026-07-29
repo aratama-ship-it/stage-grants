@@ -15,7 +15,7 @@ const SAVED_KEY = 'monosashi-grants-saved-v1';
 // --- 解析・広告（値を入れて node build.mjs で有効化。空なら読み込まれずバナーも出ない）---
 const ANALYTICS_GA4 = '';   // 例: 'G-XXXXXXXXXX'（Google Analytics 4 の測定ID）
 const ADSENSE_CLIENT = '';  // 例: 'ca-pub-1234567890123456'（AdSense 承認後のクライアントID）
-const CLOUDFLARE_WEB_ANALYTICS_TOKEN = '60f90222d9c947fc95e2c02c9dea472c'; // GitHub Pages配信用の手動ビーコン
+const CLOUDFLARE_WEB_ANALYTICS_TOKEN = 'f102e40e39e14609b979dfa120e7bb89'; // joseikin.art-monosashi.com（GitHub Pages配信用の手動ビーコン）
 const programs = JSON.parse(readFileSync(join(ROOT, 'data/programs.data.json'), 'utf8'));
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
