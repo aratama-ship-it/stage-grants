@@ -127,6 +127,24 @@
   .verified{font-size:11px;color:var(--sub);margin-top:6px}
   .disclaimer{font-size:11.5px;color:var(--sub);background:#fff;border-radius:12px;padding:12px 14px;margin:14px 0;border:1px dashed var(--line)}
   footer{max-width:900px;margin:22px auto 0;padding:0 18px;font-size:11px;color:var(--sub);text-align:center}
+  .series{border-top:1px solid var(--line);background:var(--card)}
+  .series-in{max-width:900px;margin:0 auto;padding:20px 14px 2px}
+  .series-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;margin:0 0 10px}
+  .series-title{font-size:13px;font-weight:800;color:var(--ink);letter-spacing:.04em}
+  .series-lede{font-size:12px;color:var(--sub)}
+  .series-list{list-style:none;display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:0;padding:0}
+  .series-card{display:flex;flex-direction:column;gap:3px;height:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);text-decoration:none}
+  a.series-card:hover{border-color:var(--accent);background:#fff;text-decoration:none}
+  .series-card.is-current{border-style:dashed;background:transparent}
+  .series-name{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:800;line-height:1.35}
+  a.series-card .series-name{color:var(--accent)}
+  .series-arrow{font-size:11px}
+  .series-here{font-size:10px;font-weight:700;color:var(--sub);border:1px solid var(--line);border-radius:999px;padding:1px 6px;background:#fff}
+  .series-desc{font-size:11px;line-height:1.5;color:var(--sub)}
+  .series-abroad{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 8px;margin:10px 0 0;font-size:11px;line-height:1.5;color:var(--sub)}
+  .series-abroad a{font-weight:700;color:var(--accent)}
+  @media(max-width:720px){.series-list{grid-template-columns:1fr}.series-in{padding:16px 14px 2px}}
+  .series{width:100%;text-align:left}
 </style>
 <script>window.__SITE_TRACKING={ga4:"",adsClient:"",privacyUrl:"privacy.html"};</script>
 <script src="assets/tracking.js" defer></script>
@@ -252,6 +270,18 @@
   <!-- 結果 -->
   <div id="results" class="hidden"></div>
 </main>
+
+<nav class="series" aria-label="ものさしシリーズ">
+<div class="series-in">
+<p class="series-head"><span class="series-title">ものさしシリーズ</span><span class="series-lede">名前や印象ではなく、条件と根拠で比べる。</span></p>
+<ul class="series-list">
+<li><a class="series-card" href="https://koubo.art-monosashi.com/" target="_blank" rel="noopener"><span class="series-name">身体芸術・公募ものさし<span class="series-arrow" aria-hidden="true">↗</span></span><span class="series-desc">出演・出展・滞在制作の公募を、お金の向きつきで探す</span></a></li>
+<li><span class="series-card is-current" aria-current="page"><span class="series-name">助成ものさし<span class="series-here">表示中</span></span><span class="series-desc">文化芸術の助成金を、対象・締切の根拠つきで探す</span></span></li>
+<li><a class="series-card" href="https://venue.art-monosashi.com/" target="_blank" rel="noopener"><span class="series-name">会場ものさし<span class="series-arrow" aria-hidden="true">↗</span></span><span class="series-desc">全国のイベント会場を、面積・客席・料金で見比べる</span></a></li>
+</ul>
+<p class="series-abroad"><a href="https://mesure.art-monosashi.com/" target="_blank" rel="noopener">MESURE（海外版）<span class="series-arrow" aria-hidden="true">↗</span></a><span>カナダ・米国の公募と助成を扱う姉妹サイト。仏語主表示（英語・日本語に切替可）。</span></p>
+</div>
+</nav>
 
 <footer>データは各公式サイト・募集要項PDFで一次確認したもの（2026年7月時点）。66件は個別ルールで手厚く判定、残りは地域・分野の自動判定（対象者要件は要確認）。締切等は変動します。<br><a href="saved.html">あとで見る・比較</a></footer>
 
