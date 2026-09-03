@@ -22,6 +22,13 @@ GitHub Pages で公開（静的HTML・外部依存なし）。
 3. コミットして push（GitHub Pages に反映）
 ※ 判定ツール `check.html` はロジック（ルール関数）を含むため別管理。制度追加時は本体の PROGRAMS 配列と data の両方を更新する。
 
+## 締切超過の自動降格
+
+- 判定・表示・ログの正本は、このリポジトリの外にあるワークスペースの
+  `web-projects/monosashi/_maintenance/DEADLINE_AUTO_EXPIRY_SPEC.md`。
+- ビルド時のメモリ上だけで降格し、`data/*.json`（正本）は変更しない。
+- 日付を機械的に読めない場合、除外語に該当する場合、未来の有効候補がある場合は降格しない。
+
 ## 解析・広告の有効化（Phase C）
 既定では解析・広告はオフ（Cookie追跡なし・同意バナーも出ない、クリーンな状態）。有効化するには:
 1. `build.mjs` の `ANALYTICS_GA4`（GA4測定ID `G-...`）や `ADSENSE_CLIENT`（AdSense承認後の `ca-pub-...`）に値を入れる
