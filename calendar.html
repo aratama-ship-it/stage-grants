@@ -152,7 +152,7 @@ a.pref:hover{text-decoration:none;border-color:var(--accent)}
 <script src="assets/tracking.js" defer></script>
 </head>
 <body>
-<div class="nav"><div class="nav-in"><span class="brand">助成ものさし</span><span class="site-version" aria-hidden="true">v2026.09.18</span><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu" aria-label="メニューを開く"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button><div class="nav-links" id="site-menu"><a href="index.html">ホーム</a><a href="grants.html">助成金を探す</a><a href="calendar.html" class="on">締切カレンダー</a><a href="check.html">適格性チェック</a><a href="saved.html">あとで見る <span class="saved-count" aria-label="保存件数">0</span></a><a href="about.html">このサイトについて</a></div></div></div>
+<div class="nav"><div class="nav-in"><span class="brand">助成ものさし</span><span class="site-version" aria-hidden="true">v2026.09.19</span><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu" aria-label="メニューを開く"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button><div class="nav-links" id="site-menu"><a href="index.html">ホーム</a><a href="grants.html">助成金を探す</a><a href="calendar.html" class="on">締切カレンダー</a><a href="check.html">適格性チェック</a><a href="saved.html">あとで見る <span class="saved-count" aria-label="保存件数">0</span></a><a href="about.html">このサイトについて</a></div></div></div>
 <script>
 (()=>{const button=document.querySelector('.menu-toggle');const menu=document.getElementById('site-menu');if(!button||!menu)return;const close=(focus=false)=>{button.setAttribute('aria-expanded','false');button.setAttribute('aria-label','メニューを開く');menu.classList.remove('is-open');if(focus)button.focus()};button.addEventListener('click',()=>{const open=button.getAttribute('aria-expanded')==='true';if(open){close()}else{button.setAttribute('aria-expanded','true');button.setAttribute('aria-label','メニューを閉じる');menu.classList.add('is-open')}});document.addEventListener('keydown',event=>{if(event.key==='Escape'&&button.getAttribute('aria-expanded')==='true')close(true)});window.addEventListener('resize',()=>{if(window.innerWidth>900)close()})})();
 </script>
@@ -170,7 +170,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <aside class="site-notice" aria-label="掲載情報について"><span class="site-notice__label">BETA</span><span>掲載情報は一次情報をもとに収集・整理した参考情報です（<a href="about.html">詳細</a>）。訂正・ご要望は<a href="https://docs.google.com/forms/d/e/1FAIpQLSc1pPGdqvVjMyocYNT7q-4JcVkn-c7c__ef1cveCDZ1Jf6hAQ/viewform" target="_blank" rel="noopener">フォーム</a>へ。</span></aside>
 <h1>締切カレンダー・募集状況</h1>
 <p class="lede">「いま受付中」と「募集終了・次回の目安」を一覧。日付つきの月別カレンダーは今後拡充します。</p>
-<h2>いま受付中（18）</h2>
+<h2>いま受付中（17）</h2>
 <div class="gitem-wrap"><a class="gitem" href="grants/act_kansho.html">
 <div class="t">東京芸術文化鑑賞サポート助成</div>
 <div class="m">アーツカウンシル東京 ・ 東京都</div>
@@ -179,11 +179,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <div class="t">朝日新聞文化財団 芸術活動助成金</div>
 <div class="m">朝日新聞文化財団 ・ 全国</div>
 <div class="tags"><span class="tag dl">受付中</span><span class="tag dl">締切: 2026年10月25日中にWEB申請完了（2027年度実施分）</span><span class="tag">上限100万円</span><span class="tag cash">支給: 採択決定後に交付（対象事業は翌年度実施）</span></div></a>
-<button class="save-toggle save-card" type="button" data-save-id="asahi" data-save-name="朝日新聞文化財団 芸術活動助成金" aria-pressed="false">☆</button></div><div class="gitem-wrap"><a class="gitem" href="grants/sato_kogei.html">
-<div class="t">美術工芸振興佐藤基金 研究助成</div>
-<div class="m">美術工芸振興佐藤基金 ・ 全国</div>
-<div class="tags"><span class="tag dl">受付中</span><span class="tag dl">締切: 2026年9月18日必着（令和9年度研究助成）</span><span class="tag">総額350万円・5件程度（1件ごとの上限は公式ページに明記なし）</span><span class="tag cash">支給: 未確認</span></div></a>
-<button class="save-toggle save-card" type="button" data-save-id="sato_kogei" data-save-name="美術工芸振興佐藤基金 研究助成" aria-pressed="false">☆</button></div><div class="gitem-wrap"><a class="gitem" href="grants/katsushika_art.html">
+<button class="save-toggle save-card" type="button" data-save-id="asahi" data-save-name="朝日新聞文化財団 芸術活動助成金" aria-pressed="false">☆</button></div><div class="gitem-wrap"><a class="gitem" href="grants/katsushika_art.html">
 <div class="t">葛飾区アートイベント助成</div>
 <div class="m">葛飾区 ・ 東京都葛飾区</div>
 <div class="tags"><span class="tag dl">受付中</span><span class="tag dl">締切: 事業開始日の1か月前までに事前相談（2026年度実施事業）</span><span class="tag">対象経費の1/2以内・上限50万円</span><span class="tag cash">支給: 未確認</span></div></a>
@@ -244,7 +240,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <div class="m">高崎市 ・ 群馬県高崎市</div>
 <div class="tags"><span class="tag dl">受付中</span><span class="tag dl">締切: 備品は令和8年度締切済み／活動は事前相談のうえ事業実施前に申請（予算上限あり）</span><span class="tag">備品: 2/3以内・上限100万円／活動: 1/2以内・上限20万円（旅費・宿泊費のみ対象）</span><span class="tag cash">支給: 口座振込（実績報告書提出後2週間程度で交付）</span></div></a>
 <button class="save-toggle save-card" type="button" data-save-id="takasaki_dentou_geinou" data-save-name="高崎市 伝統芸能等支援補助事業" aria-pressed="false">☆</button></div>
-<h2>現在は募集終了・次回待ち（219）</h2>
+<h2>現在は募集終了・次回待ち（220）</h2>
 <div class="gitem-wrap"><a class="gitem" href="grants/act_c1.html">
 <div class="t">東京芸術文化創造発信助成 カテゴリーI（芸術創造・単年）</div>
 <div class="m">アーツカウンシル東京 ・ 東京都</div>
@@ -521,7 +517,11 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <div class="t">ポーラ伝統文化振興財団 助成事業</div>
 <div class="m">ポーラ伝統文化振興財団 ・ 全国</div>
 <div class="tags"><span class="tag">募集時期は要確認</span><span class="tag">例年2〜3月（次回具体日は要確認）</span><span class="tag">1件概ね30〜200万円（複数年事業は最長約3年）</span><span class="tag cash">支給: 未確認</span></div></a>
-<button class="save-toggle save-card" type="button" data-save-id="pola_dento" data-save-name="ポーラ伝統文化振興財団 助成事業" aria-pressed="false">☆</button></div><div class="gitem-wrap"><a class="gitem" href="grants/kyoto_shorei.html">
+<button class="save-toggle save-card" type="button" data-save-id="pola_dento" data-save-name="ポーラ伝統文化振興財団 助成事業" aria-pressed="false">☆</button></div><div class="gitem-wrap"><a class="gitem" href="grants/sato_kogei.html">
+<div class="t">美術工芸振興佐藤基金 研究助成</div>
+<div class="m">美術工芸振興佐藤基金 ・ 全国</div>
+<div class="tags"><span class="tag">受付終了（締切日経過）</span><span class="tag">2026年9月18日必着（令和9年度研究助成）</span><span class="tag">総額350万円・5件程度（1件ごとの上限は公式ページに明記なし）</span><span class="tag cash">支給: 未確認</span></div></a>
+<button class="save-toggle save-card" type="button" data-save-id="sato_kogei" data-save-name="美術工芸振興佐藤基金 研究助成" aria-pressed="false">☆</button></div><div class="gitem-wrap"><a class="gitem" href="grants/kyoto_shorei.html">
 <div class="t">京都市芸術文化特別奨励制度</div>
 <div class="m">京都市 ・ 京都府京都市</div>
 <div class="tags"><span class="tag">受付終了（締切日経過）</span><span class="tag">2026年8月28日17:00締切（令和9年度奨励者募集）</span><span class="tag">1個人／1グループ 300万円（採択2名）</span><span class="tag cash">支給: 前払い型（活動前交付）</span></div></a>

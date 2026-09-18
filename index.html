@@ -191,7 +191,7 @@ a.pref:hover{text-decoration:none;border-color:var(--accent)}
 <script src="assets/tracking.js" defer></script>
 </head>
 <body>
-<div class="nav"><div class="nav-in"><span class="brand">助成ものさし</span><span class="site-version" aria-hidden="true">v2026.09.18</span><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu" aria-label="メニューを開く"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button><div class="nav-links" id="site-menu"><a href="index.html" class="on">ホーム</a><a href="grants.html">助成金を探す</a><a href="calendar.html">締切カレンダー</a><a href="check.html">適格性チェック</a><a href="saved.html">あとで見る <span class="saved-count" aria-label="保存件数">0</span></a><a href="about.html">このサイトについて</a></div></div></div>
+<div class="nav"><div class="nav-in"><span class="brand">助成ものさし</span><span class="site-version" aria-hidden="true">v2026.09.19</span><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="site-menu" aria-label="メニューを開く"><span class="bar"></span><span class="bar"></span><span class="bar"></span></button><div class="nav-links" id="site-menu"><a href="index.html" class="on">ホーム</a><a href="grants.html">助成金を探す</a><a href="calendar.html">締切カレンダー</a><a href="check.html">適格性チェック</a><a href="saved.html">あとで見る <span class="saved-count" aria-label="保存件数">0</span></a><a href="about.html">このサイトについて</a></div></div></div>
 <script>
 (()=>{const button=document.querySelector('.menu-toggle');const menu=document.getElementById('site-menu');if(!button||!menu)return;const close=(focus=false)=>{button.setAttribute('aria-expanded','false');button.setAttribute('aria-label','メニューを開く');menu.classList.remove('is-open');if(focus)button.focus()};button.addEventListener('click',()=>{const open=button.getAttribute('aria-expanded')==='true';if(open){close()}else{button.setAttribute('aria-expanded','true');button.setAttribute('aria-label','メニューを閉じる');menu.classList.add('is-open')}});document.addEventListener('keydown',event=>{if(event.key==='Escape'&&button.getAttribute('aria-expanded')==='true')close(true)});window.addEventListener('resize',()=>{if(window.innerWidth>900)close()})})();
 </script>
@@ -216,7 +216,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 </div>
 <div class="stat home-stat">
 <div><div class="n">237</div><div class="l">収録制度</div></div>
-<div><div class="n">18</div><div class="l">受付中</div></div>
+<div><div class="n">17</div><div class="l">受付中</div></div>
 <div><div class="n">5</div><div class="l">ジャンル</div></div>
 <a class="stat-sister" href="https://koubo.art-monosashi.com/" target="_blank" rel="noopener"><span class="stat-sister-kicker">姉妹サイト</span><span class="stat-sister-name">身体芸術・公募ものさしへ →</span></a>
 </div>
@@ -242,8 +242,8 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <div class="tabpane hidden" id="tab-deadline">
 <p class="note" style="margin:2px 0 12px">締切・募集状況から探す。日付つきの月別カレンダーは今後拡充します。</p>
 <div class="regionbar">
-<a class="pref" href="calendar.html" style="font-size:14px;padding:9px 16px">いま受付中（18件）</a>
-<a class="pref" href="calendar.html" style="font-size:14px;padding:9px 16px">募集終了・次回待ち（219件）</a>
+<a class="pref" href="calendar.html" style="font-size:14px;padding:9px 16px">いま受付中（17件）</a>
+<a class="pref" href="calendar.html" style="font-size:14px;padding:9px 16px">募集終了・次回待ち（220件）</a>
 </div>
 <p><a class="cta" href="calendar.html">締切カレンダー・募集状況の一覧を見る →</a></p></div>
 
@@ -257,11 +257,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <div class="t">朝日新聞文化財団 芸術活動助成金</div>
 <div class="m">朝日新聞文化財団 ・ 全国</div>
 <div class="tags"><span class="tag dl">受付中</span><span class="tag dl">締切: 2026年10月25日中にWEB申請完了（2027年度実施分）</span><span class="tag">上限100万円</span><span class="tag cash">支給: 採択決定後に交付（対象事業は翌年度実施）</span></div></a>
-<button class="save-toggle save-card" type="button" data-save-id="asahi" data-save-name="朝日新聞文化財団 芸術活動助成金" aria-pressed="false">☆</button></div><div class="gitem-wrap"><a class="gitem" href="grants/sato_kogei.html">
-<div class="t">美術工芸振興佐藤基金 研究助成</div>
-<div class="m">美術工芸振興佐藤基金 ・ 全国</div>
-<div class="tags"><span class="tag dl">受付中</span><span class="tag dl">締切: 2026年9月18日必着（令和9年度研究助成）</span><span class="tag">総額350万円・5件程度（1件ごとの上限は公式ページに明記なし）</span><span class="tag cash">支給: 未確認</span></div></a>
-<button class="save-toggle save-card" type="button" data-save-id="sato_kogei" data-save-name="美術工芸振興佐藤基金 研究助成" aria-pressed="false">☆</button></div><div class="gitem-wrap"><a class="gitem" href="grants/katsushika_art.html">
+<button class="save-toggle save-card" type="button" data-save-id="asahi" data-save-name="朝日新聞文化財団 芸術活動助成金" aria-pressed="false">☆</button></div><div class="gitem-wrap"><a class="gitem" href="grants/katsushika_art.html">
 <div class="t">葛飾区アートイベント助成</div>
 <div class="m">葛飾区 ・ 東京都葛飾区</div>
 <div class="tags"><span class="tag dl">受付中</span><span class="tag dl">締切: 事業開始日の1か月前までに事前相談（2026年度実施事業）</span><span class="tag">対象経費の1/2以内・上限50万円</span><span class="tag cash">支給: 未確認</span></div></a>
@@ -297,8 +293,12 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <div class="t">鳥取市伝統・郷土芸能団体備品整備補助金</div>
 <div class="m">鳥取市 ・ 鳥取県鳥取市</div>
 <div class="tags"><span class="tag dl">受付中</span><span class="tag dl">締切: 2026年4月1日から受付（締切日の記載なし、事業開始前に申請）</span><span class="tag">補助対象経費（修繕費・備品購入費・消耗品費・輸送料）の1/2以内、上限50万円</span><span class="tag cash">支給: 原則精算払い（必要と認められる場合は概算払いも可）</span></div></a>
-<button class="save-toggle save-card" type="button" data-save-id="tottori_dentou_bihin" data-save-name="鳥取市伝統・郷土芸能団体備品整備補助金" aria-pressed="false">☆</button></div>
-<p><a class="cta" href="calendar.html">受付中の助成をすべて見る（18件）→</a></p>
+<button class="save-toggle save-card" type="button" data-save-id="tottori_dentou_bihin" data-save-name="鳥取市伝統・郷土芸能団体備品整備補助金" aria-pressed="false">☆</button></div><div class="gitem-wrap"><a class="gitem" href="grants/sakaiminato_art_start.html">
+<div class="t">境港市アートスタート「次世代鑑賞者育成事業」支援事業補助金</div>
+<div class="m">境港市 ・ 鳥取県境港市</div>
+<div class="tags"><span class="tag dl">受付中</span><span class="tag dl">締切: 事業開始日の30日前まで（事前連絡必須）</span><span class="tag">補助対象経費（収入控除後）の1/2または上限10万円のいずれか低い額</span><span class="tag cash">支給: 精算払い（実績報告に基づく交付額確定）</span></div></a>
+<button class="save-toggle save-card" type="button" data-save-id="sakaiminato_art_start" data-save-name="境港市アートスタート「次世代鑑賞者育成事業」支援事業補助金" aria-pressed="false">☆</button></div>
+<p><a class="cta" href="calendar.html">受付中の助成をすべて見る（17件）→</a></p>
 
 <div class="discl">これは開発中のプロトタイプです。適格性の判定は募集要項の明示条件のみに基づく機械的なもので、採択可能性を示すものではありません。</div>
 <script>
