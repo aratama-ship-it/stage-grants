@@ -2,11 +2,14 @@
 // data/programs.data.json → 各ページのHTMLを生成する。
 // 使い方: node build.mjs
 import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { expiredDeadlineTimeOf } from './lib/deadline-expiry.mjs';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
+const OUTPUT_ROOT = process.env.BUILD_OUTPUT_DIR ? resolve(process.env.BUILD_OUTPUT_DIR) : ROOT;
+const referenceDate = process.env.BUILD_REFERENCE_DATE ? new Date(process.env.BUILD_REFERENCE_DATE) : new Date();
+if (Number.isNaN(referenceDate.getTime())) throw new Error('BUILD_REFERENCE_DATE must be a valid date');
 const SITE_NAME = '助成ものさし';
 const BASE_URL = 'https://joseikin.art-monosashi.com/';
 const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSc1pPGdqvVjMyocYNT7q-4JcVkn-c7c__ef1cveCDZ1Jf6hAQ/viewform'; // ご意見・情報訂正 共通フォーム
@@ -20,7 +23,7 @@ const CLOUDFLARE_WEB_ANALYTICS_TOKEN = 'f102e40e39e14609b979dfa120e7bb89'; // jo
 // 締切超過の自動降格: ../_maintenance/DEADLINE_AUTO_EXPIRY_SPEC.md
 const todayParts = Object.fromEntries(new Intl.DateTimeFormat('en', {
   timeZone: 'Asia/Tokyo', year: 'numeric', month: 'numeric', day: 'numeric',
-}).formatToParts(new Date()).filter((part) => part.type !== 'literal').map((part) => [part.type, Number(part.value)]));
+}).formatToParts(referenceDate).filter((part) => part.type !== 'literal').map((part) => [part.type, Number(part.value)]));
 const { year: sortYear, month: sortMonth, day: sortDay } = todayParts;
 const sortBaseTime = Date.UTC(sortYear, sortMonth - 1, sortDay);
 const sortBaseDate = `${sortYear}-${String(sortMonth).padStart(2, '0')}-${String(sortDay).padStart(2, '0')}`;
@@ -374,7 +377,7 @@ function write(rel, html) {
 <meta name="twitter:image" content="${BASE_URL}assets/og-card.png">`;
   html = html.replace(/(<meta name="description" content="[\s\S]*?">)/, `$1\n${head}`);
   WRITTEN_PAGES.push(rel);
-  const abs = join(ROOT, rel);
+  const abs = join(OUTPUT_ROOT, rel);
   mkdirSync(dirname(abs), { recursive: true });
   writeFileSync(abs, html);
 }
@@ -680,8 +683,8 @@ ${pages.map((rel) => {
     return `<url><loc>${url}</loc>${verified ? `<lastmod>${verified}</lastmod>` : ''}</url>`;
   }).join('\n')}
 </urlset>`;
-  writeFileSync(join(ROOT, 'sitemap.xml'), sitemap);
-  writeFileSync(join(ROOT, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}sitemap.xml\n`);
+  writeFileSync(join(OUTPUT_ROOT, 'sitemap.xml'), sitemap);
+  writeFileSync(join(OUTPUT_ROOT, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}sitemap.xml\n`);
 }
 
 console.log(`Generated: index, grants, calendar, ${BUCKETS.length} regions, ${GENRES.length} genres, ${programs.length} grant pages, 3 policy pages, sitemap(${WRITTEN_PAGES.length + 1} urls), robots.txt.`);
