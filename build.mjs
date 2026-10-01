@@ -7,7 +7,6 @@ import { fileURLToPath } from 'node:url';
 import { expiredDeadlineTimeOf } from './lib/deadline-expiry.mjs';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
-const VERIFIED = '2026-07-18';
 const SITE_NAME = '助成ものさし';
 const BASE_URL = 'https://joseikin.art-monosashi.com/';
 const FORM_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSc1pPGdqvVjMyocYNT7q-4JcVkn-c7c__ef1cveCDZ1Jf6hAQ/viewform'; // ご意見・情報訂正 共通フォーム
@@ -567,7 +566,7 @@ for (const p of programs) {
 <div class="kv"><div class="k">主な応募条件</div><ul class="cond">${p.conditions.map((c) => `<li>${esc(c)}</li>`).join('')}</ul></div>
 ${p.note ? `<p class="note">ℹ️ ${esc(p.note)}</p>` : ''}
 ${p.funderQ ? `<div class="qbox"><b>助成元への確認事項</b><br>${esc(p.funderQ)}</div>` : ''}
-<div class="src">📄 出典: <a href="${esc(p.src)}" target="_blank" rel="noopener">${esc(p.funder)} 公式ページ</a></div>
+<div class="src">📄 出典: <a href="${esc(p.src)}" target="_blank" rel="noopener">一次情報・公式発表</a></div>
 ${p.verified ? `<p class="verified fresh">✓ 最終確認：${esc(p.verified)}（${esc(p.verificationSource || '主催者公式ページ')}）</p>` : ''}
 <p class="verified">掲載情報は更新のタイミングにより、最新の募集状況と異なる場合があります。応募前に必ず公式の最新要項をご確認ください。</p>
 </div>
@@ -669,10 +668,17 @@ write('disclaimer.html', layout({
 // ---- sitemap.xml / robots.txt ----
 {
   const staticPages = ['check.html'];
-  const urls = [...WRITTEN_PAGES, ...staticPages].map((rel) => BASE_URL + rel.replace(/^index\.html$/, ''));
+  const pages = [...WRITTEN_PAGES, ...staticPages];
+  const verifiedByPath = new Map(programs
+    .filter((p) => /^\d{4}-\d{2}-\d{2}$/.test(String(p.verified || '')))
+    .map((p) => [`grants/${p.id}.html`, p.verified]));
   const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map((u) => `<url><loc>${u}</loc><lastmod>${VERIFIED}</lastmod></url>`).join('\n')}
+${pages.map((rel) => {
+    const url = BASE_URL + rel.replace(/^index\.html$/, '');
+    const verified = verifiedByPath.get(rel);
+    return `<url><loc>${url}</loc>${verified ? `<lastmod>${verified}</lastmod>` : ''}</url>`;
+  }).join('\n')}
 </urlset>`;
   writeFileSync(join(ROOT, 'sitemap.xml'), sitemap);
   writeFileSync(join(ROOT, 'robots.txt'), `User-agent: *\nAllow: /\nSitemap: ${BASE_URL}sitemap.xml\n`);
