@@ -566,7 +566,7 @@ for (const p of programs) {
 <div class="kv"><div class="k">主な応募条件</div><ul class="cond">${p.conditions.map((c) => `<li>${esc(c)}</li>`).join('')}</ul></div>
 ${p.note ? `<p class="note">ℹ️ ${esc(p.note)}</p>` : ''}
 ${p.funderQ ? `<div class="qbox"><b>助成元への確認事項</b><br>${esc(p.funderQ)}</div>` : ''}
-<div class="src">📄 出典: <a href="${esc(p.src)}" target="_blank" rel="noopener">一次情報・公式発表</a></div>
+<div class="src">📄 出典: <a href="${esc(p.src)}" target="_blank" rel="noopener">${esc(p.funder)} 公式ページ</a></div>
 ${p.verified ? `<p class="verified fresh">✓ 最終確認：${esc(p.verified)}（${esc(p.verificationSource || '主催者公式ページ')}）</p>` : ''}
 <p class="verified">掲載情報は更新のタイミングにより、最新の募集状況と異なる場合があります。応募前に必ず公式の最新要項をご確認ください。</p>
 </div>
