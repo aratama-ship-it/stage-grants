@@ -4,6 +4,7 @@
 import { readFileSync, writeFileSync, mkdirSync, rmSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { expiredDeadlineTimeOf } from './lib/deadline-expiry.mjs';
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const VERIFIED = '2026-07-18';
@@ -23,75 +24,19 @@ const todayParts = Object.fromEntries(new Intl.DateTimeFormat('en', {
 }).formatToParts(new Date()).filter((part) => part.type !== 'literal').map((part) => [part.type, Number(part.value)]));
 const { year: sortYear, month: sortMonth, day: sortDay } = todayParts;
 const sortBaseTime = Date.UTC(sortYear, sortMonth - 1, sortDay);
+const sortBaseDate = `${sortYear}-${String(sortMonth).padStart(2, '0')}-${String(sortDay).padStart(2, '0')}`;
 const SITE_VERSION = `v${sortYear}.${String(sortMonth).padStart(2, '0')}.${String(sortDay).padStart(2, '0')}`;
-const dateTokenSource = '(?:\\d{4}年\\d{1,2}月\\d{1,2}日|\\d{4}\\/\\d{1,2}\\/\\d{1,2}|\\d{1,2}月\\d{1,2}日|\\d{1,2}\\/\\d{1,2})';
-const legacyNeverDeadline = /(?:とみられる|二次情報|正確な締切|締切日.*要確認|詳細締切.*未確認|締切明記なし|チケット販売中|種目により異なる|事前申込不要|開催直前まで|使用日の|使用希望日の|公演日の|利用希望日の|本番\d+週間前|順次開始)/;
-const neverExpireDeadline = /(?:とみられる|二次情報|正確な締切|締切日.*要確認|詳細締切.*未確認|締切明記なし|チケット販売中|種目により異なる|事前申込不要|開催直前まで|使用日の|使用希望日の|公演日の|利用希望日の|本番\d+週間前|順次開始|随時|通年|記載なし|明記なし|締切設定なし|締切なし|特定の締切)/;
-const rollingExampleDeadline = /(?:ローリング|ほぼ毎月).*(?:例:|例：)/;
-
-function deadlineCandidatesOf(deadline, { expiry = false } = {}) {
-  const text = String(deadline || '').replace(/令和(\d+)年/g, (_, year) => `${2018 + Number(year)}年`);
-  if ((expiry ? neverExpireDeadline : legacyNeverDeadline).test(text) || rollingExampleDeadline.test(text)) return [];
-  const candidates = [];
-  const tokenRe = new RegExp(dateTokenSource, 'g');
-  let match;
-  while ((match = tokenRe.exec(text))) {
-    const token = match[0];
-    let year = sortYear;
-    let month;
-    let day;
-    let parts = token.match(/^(?:(\d{4})年)?(\d{1,2})月(\d{1,2})日$/);
-    if (parts) {
-      year = Number(parts[1] || sortYear);
-      month = Number(parts[2]);
-      day = Number(parts[3]);
-    } else {
-      parts = token.match(/^(?:(\d{4})\/)?(\d{1,2})\/(\d{1,2})$/);
-      if (!parts) continue;
-      year = Number(parts[1] || sortYear);
-      month = Number(parts[2]);
-      day = Number(parts[3]);
-    }
-    const time = Date.UTC(year, month - 1, day);
-    if (!expiry && time < sortBaseTime) continue;
-    const before = text.slice(Math.max(0, match.index - 24), match.index);
-    const after = text.slice(match.index + token.length, match.index + token.length + 24);
-    let score = 0;
-    if (/(?:締切|必着|消印|期限|エントリー期間|作品受付|申込)[^。、（）()]{0,16}$/.test(before)) score += 100;
-    const closeAt = after.search(/締切|必着|消印|まで/);
-    const anotherDateAt = after.search(new RegExp(dateTokenSource));
-    if (closeAt >= 0 && (anotherDateAt < 0 || closeAt < anotherDateAt)) score += 100;
-    if (/〜\s*$/.test(before)) score += 160;
-    if (!candidates.length && /^★?(?:受付中|募集中|次回募集)/.test(text)) score += 60;
-    if (/^[^。、（）()]{0,6}(?:開催分|実施分|対象)/.test(after)) score -= 200;
-    if (expiry && /(?:演奏会|本審査|開催|公演|上演|審査|発表|実施|大会|フェス|本番|コンサート)[^。、（）()]{0,8}$/.test(before)) score -= 200;
-    if (expiry && /^\s*〜/.test(after)) score -= 200;
-    candidates.push({ time, score });
-  }
-  return candidates;
-}
-
-function expiredDeadlineTimeOf(item) {
-  const candidates = deadlineCandidatesOf(item.deadline, { expiry: true });
-  if (!candidates.length) return null;
-  const maxScore = Math.max(...candidates.map((candidate) => candidate.score));
-  if (maxScore < 50) return null;
-  if (candidates.some((candidate) => candidate.score >= 0 && candidate.time >= sortBaseTime)) return null;
-  const deadlineTime = Math.max(...candidates.filter((candidate) => candidate.score === maxScore).map((candidate) => candidate.time));
-  return deadlineTime < sortBaseTime ? deadlineTime : null;
-}
 
 const programs = JSON.parse(readFileSync(join(ROOT, 'data/programs.data.json'), 'utf8'));
 const expiredPrograms = [];
 for (const p of programs) {
   if (!p.dlUrgent) continue;
-  const deadlineTime = expiredDeadlineTimeOf(p);
+  const deadlineTime = expiredDeadlineTimeOf(p, sortBaseDate);
   if (deadlineTime === null) continue;
   p.dlUrgent = false;
   p.dlExpired = true;
   expiredPrograms.push({ item: p, deadlineTime });
 }
-const sortBaseDate = `${sortYear}-${String(sortMonth).padStart(2, '0')}-${String(sortDay).padStart(2, '0')}`;
 console.log(`[deadline-expiry] 基準日 ${sortBaseDate}（Asia/Tokyo）`);
 console.log(`[deadline-expiry] 受付中→受付終了に自動降格: ${expiredPrograms.length}件`);
 for (const { item, deadlineTime } of expiredPrograms) console.log(`  - ${item.id} ${item.name} / 締切 ${new Date(deadlineTime).toISOString().slice(0, 10)}`);
