@@ -45,6 +45,7 @@ for (const { item, deadlineTime } of expiredPrograms) console.log(`  - ${item.id
 console.log(`[deadline-expiry] 降格後の受付中: ${programs.filter((p) => p.dlUrgent).length}件`);
 
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+const BUILD_SHA_META = process.env.BUILD_SHA ? `<meta name="build-sha" content="${esc(process.env.BUILD_SHA)}">\n` : '';
 
 // ---- 地域バケット ----
 // 47都道府県 → ローマ字キー（region文字列に都道府県名が含まれれば自動でその県バケットに振り分け）
@@ -137,7 +138,7 @@ function layout({ title, desc, rel, body, active, extraCss = '' }) {
   return `<!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
+${BUILD_SHA_META}<meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(desc)}">
