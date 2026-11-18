@@ -1148,16 +1148,16 @@ const PROGRAMS = [
  {
   id:'kakehashi', name:'かけはし芸術文化振興財団 公演活動助成',
   funder:'かけはし芸術文化振興財団', region:'全国',
-  deadline:'例年10月〜1月上旬（次回は2026秋頃）', dlUrgent:false,
-  amount:'概ね10〜200万円',
-  payment:'未確認',
-  cashflow:'未確認',
-  src:'https://www.kakehashi-foundation.jp/activity/support/',
+  deadline:'2027年1月6日12:00 Web締切', dlUrgent:true,
+  amount:'1件10万〜200万円程度',
+  payment:'2027年4月以降に事業の実施時期に応じて支給',
+  cashflow:'2027年4月以降（実施時期に応じて支給）',
+  src:'https://www.kakehashi-foundation.jp/activity/support/2027_require_grant/',
   rules:[
     p=> PASS('個人・団体いずれも応募可'),
-    p=> p.genres.includes('音楽') ? CHECK('電子技術を応用した音楽公演','電子技術・電子楽器の応用が必須。該当するか要確認') : FAIL('電子技術を応用した芸術文化','対象外'),
+    p=> CHECK('電子技術を応用した国内公演等','ジャンルは不問。電子技術の活用と第三者の推薦状を要確認'),
   ],
-  softNote:'旧・ローランド芸術文化振興財団。'
+  softNote:'講演会・調査研究・国際交流を含む全4枠で、1申請者1件。'
  },
  {
   id:'jcmf', name:'日本室内楽振興財団 助成',
