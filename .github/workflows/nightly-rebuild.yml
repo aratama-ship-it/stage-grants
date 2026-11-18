@@ -35,7 +35,6 @@ jobs:
           mkdir -p _site
           cp -R assets _site/assets
           cp CNAME _site/CNAME
-          cp check.html _site/check.html
 
       - name: Build
         env:
@@ -44,7 +43,9 @@ jobs:
         run: node build.mjs
 
       - name: Test
-        run: node --test tests/
+        run: |
+          node --test tests/
+          node test-check.mjs _site
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v5

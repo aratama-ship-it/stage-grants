@@ -1,9 +1,10 @@
 {
   "referenceDate": "2026-10-01T03:00:00+09:00",
-  "htmlCount": 297,
+  "htmlCount": 298,
   "files": {
     "about.html": "b51a62722cd46507b02534821bae642bf440f433df48fd468093a934cb9492d9",
     "calendar.html": "acfb8b8a841ec693f4fde692eed2444eedf54469f23710ea474d6a146d2bb425",
+    "check.html": "2cba64d64b6a83ce0026c9895ce16984f847d51c41ca5e72a06685a4258d47cc",
     "disclaimer.html": "e2eb13bb8648d53663d9248cfaf0aafb55d7fe235b487f59f094ab8cb7e087bc",
     "genres/bijutsu.html": "bcbed3b759c72d546e6c527a235102ae3fc15df011b1427b8240696462977241",
     "genres/bungei.html": "67e67499a2c1260689cc75a85bfc7debb7e86fd31a713ea9a9f85fffdc335a9d",

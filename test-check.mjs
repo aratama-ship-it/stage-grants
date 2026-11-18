@@ -1,34 +1,51 @@
 // check.html の判定ロジックのスモークテスト（node:vm でスクリプトを実行し、代表シナリオを検証）
 import { readFileSync } from 'node:fs';
-import { dirname, join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import vm from 'node:vm';
 const ROOT = dirname(fileURLToPath(import.meta.url));
-const html = readFileSync(join(ROOT, 'check.html'), 'utf8');
-const data = JSON.parse(readFileSync(join(ROOT, 'data/programs.data.json'), 'utf8'));
+const site = process.argv[2] ? resolve(process.argv[2]) : ROOT;
+const html = readFileSync(join(site, 'check.html'), 'utf8');
+const source = JSON.parse(readFileSync(join(ROOT, 'data/programs.data.json'), 'utf8'));
 
 // メインスクリプト（tracking系を除く）を抽出
 const scripts = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]).filter((s) => !s.includes('__SITE_TRACKING'));
-const code = scripts.join('\n') + '\nglobalThis.__test = { get ALL_PROGRAMS() { return ALL_PROGRAMS; }, assess, genericRulesFor };';
+const code = scripts.join('\n') + '\nglobalThis.__test = { get ALL_PROGRAMS() { return ALL_PROGRAMS; }, PROGRAMS, programsReady, assess, genericRulesFor };';
 
 // 最小限のDOMスタブ
 const el = () => ({
-  innerHTML: '', value: '', options: [], classList: { toggle() {}, add() {}, remove() {} }, dataset: {}, onclick: null,
+  innerHTML: '', textContent: '', value: '', disabled: true, classList: { toggle() {}, add() {}, remove() {} }, dataset: {}, onclick: null,
+  replaceChildren(...options) { this.options = options; },
   addEventListener() {}, setAttribute() {}, getAttribute() { return 'false'; }, focus() {},
 });
-const sandbox = {
-  document: { getElementById: () => el(), querySelectorAll: () => [], querySelector: () => el(), addEventListener() {} },
-  window: { scrollTo() {}, addEventListener() {}, innerWidth: 1024 },
-  fetch: () => Promise.resolve({ json: () => Promise.resolve(data) }),
-  console,
-};
-vm.createContext(sandbox);
-vm.runInContext(code, sandbox);
+async function startChecker(fetch) {
+  const elements = new Map();
+  const getElementById = id => {
+    if (!elements.has(id)) elements.set(id, el());
+    return elements.get(id);
+  };
+  const sandbox = {
+    document: { getElementById, querySelectorAll: () => [], querySelector: () => el(), addEventListener() {} },
+    window: { scrollTo() {}, addEventListener() {}, innerWidth: 1024 },
+    fetch,
+    AbortController, setTimeout, clearTimeout,
+    Option: function Option(label, value) { this.text = label; this.value = value; },
+    console: { warn() {} },
+  };
+  vm.runInNewContext(code, sandbox);
+  await sandbox.__test.programsReady;
+  return sandbox.__test;
+}
 
-// fetch解決を待つ
-await new Promise((r) => setTimeout(r, 50));
-
-const { ALL_PROGRAMS, assess, genericRulesFor } = sandbox.__test;
+const deliveredById = new Map();
+const { ALL_PROGRAMS, PROGRAMS, assess, genericRulesFor } = await startChecker(async url => ({
+  ok: true,
+  json() {
+    const records = JSON.parse(readFileSync(join(site, url), 'utf8'));
+    for (const record of records) deliveredById.set(record.id, record);
+    return records;
+  },
+}));
 const profile = (over = {}) => ({
   applicantKind: 'organization', legalForm: 'voluntary_association', foundedYear: 2021,
   age: 34, worksCreated: 5, prefecture: '東京都', city: '', genres: ['演劇'],
@@ -40,9 +57,22 @@ let fail = 0;
 const t = (name, cond) => { if (cond) console.log('  ✓ ' + name); else { console.error('  ✗ ' + name); fail++; } };
 
 console.log('1. 全件ロード');
-t('ALL_PROGRAMS が全件と一致', ALL_PROGRAMS.length === data.length);
-t('最終確認日は YYYY-MM-DD 形式', data.every((p) => !p.verified || /^\d{4}-\d{2}-\d{2}$/.test(p.verified)));
-t('最終確認済み案件には確認元がある', data.every((p) => !p.verified || Boolean(p.verificationSource)));
+const sourceIds = new Set(source.map(p => p.id));
+t('すべての掲載IDを重複なく判定対象にする', ALL_PROGRAMS.length === source.length &&
+  new Set(ALL_PROGRAMS.map(p => p.id)).size === sourceIds.size && ALL_PROGRAMS.every(p => sourceIds.has(p.id)));
+t('最終確認日は YYYY-MM-DD 形式', source.every((p) => !p.verified || /^\d{4}-\d{2}-\d{2}$/.test(p.verified)));
+t('最終確認済み案件には確認元がある', source.every((p) => !p.verified || Boolean(p.verificationSource)));
+const byId = new Map(ALL_PROGRAMS.map(p => [p.id, p]));
+t('個別ルールを保持する', PROGRAMS.every(p => !sourceIds.has(p.id) || byId.get(p.id)?.rules === p.rules));
+t('個別ルールの制度にも配信データの締切を使う', PROGRAMS.every(p =>
+  !sourceIds.has(p.id) || byId.get(p.id)?.deadline === deliveredById.get(p.id)?.deadline));
+if (site !== ROOT) {
+  t('公開データに全制度の受付状態を含む', ALL_PROGRAMS.every(p => Boolean(p.statusLabel)));
+  t('一部受付の表示が一致する', source.filter(p => p.applicationStatus === 'partial').every(p => byId.get(p.id)?.statusLabel === '一部受付'));
+}
+const unavailable = await startChecker(async () => ({ ok: false, status: 404 }));
+t('制度データが取得できない場合は内蔵の個別ルールだけで判定できる',
+  unavailable.ALL_PROGRAMS === unavailable.PROGRAMS);
 
 console.log('2. 全制度×代表プロファイルでエラーなく判定できる');
 const profiles = [profile(), profile({ applicantKind: 'individual', genres: ['美術'] }), profile({ prefecture: '三重県', city: '津市', genres: ['文芸・伝統芸能'] }), profile({ prefecture: '愛媛県', city: '松山市', genres: ['音楽', '映像'] })];
@@ -75,7 +105,7 @@ t('個人OK明記＋人数表記あり（京都市）は個人にFAILしない',
 t('個人OK明記の制度に「団体要件の可能性」を出さない', !a4.results.some((r) => /団体要件の可能性/.test(r.txt)));
 
 console.log('5. ジャンル判定（未検証の一括タグは美術/映像/文芸をCHECKに倒す）');
-const generic5 = ALL_PROGRAMS.find((p) => p.generic && data.find((d) => d.id === p.id)?.genres.length === 5);
+const generic5 = ALL_PROGRAMS.find((p) => p.generic && p.genres.length === 5);
 const g1 = assess(generic5, profile({ genres: ['美術'], prefecture: '東京都' }));
 t('5ジャンル一括タグ制度で美術選択→ジャンル項目がPASSでなくCHECK', g1.results.some((r) => r.result === 'needs_check' && /対象分野/.test(r.txt)));
 

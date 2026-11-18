@@ -20,7 +20,7 @@ GitHub Pages で公開（静的HTML・外部依存なし）。
 1. `data/programs.data.json` を編集（制度の追加・更新）
 2. `node build.mjs` で全ページを再生成
 3. コミットして push（GitHub Pages に反映）
-※ 判定ツール `check.html` はロジック（ルール関数）を含むため別管理。制度追加時は本体の PROGRAMS 配列と data の両方を更新する。
+判定ツール `check.html` は一覧と同じ制度データを読み込む。個別ルールが必要な制度は、`check.html` の `PROGRAMS` に同じ掲載IDで定義する。GitHub Actions は `BUILD_OUTPUT_DIR=_site node build.mjs` で `check.html` と `data/programs.data.json` を生成し、`node test-check.mjs _site` で配信物を検査する。
 
 ## 締切超過の自動降格
 

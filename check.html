@@ -86,6 +86,7 @@
   .cta{width:100%;padding:15px;background:var(--accent);color:#fff;border:none;border-radius:13px;
     font-size:16px;font-weight:700;cursor:pointer;margin-top:20px;font-family:inherit}
   .cta:active{transform:translateY(1px)}
+  .cta:disabled{opacity:.7;cursor:wait}
   .hidden{display:none}
   /* results */
   .backbtn{display:inline-flex;align-items:center;gap:6px;background:var(--accent-soft);color:var(--accent);
@@ -160,7 +161,7 @@
 <header>
   <h1>文化芸術 助成金 適格性チェック</h1>
   <p class="lede">団体・企画の情報から、応募できる助成を根拠つきで判定します。舞台・音楽・美術・映像・文芸/伝統芸能に対応。</p>
-  <span class="proto-tag">PROTOTYPE · 全国の助成237件を判定対象（うち66件は個別ルールで手厚く判定） · 2026-07-18時点</span>
+  <span class="proto-tag" id="check-data-status" role="status">助成制度を読み込んでいます</span>
 </header>
 
 <main>
@@ -263,7 +264,8 @@
       </div>
     </div>
 
-    <button class="cta" onclick="run()">適格性を判定する</button>
+    <button class="cta" id="run-check" type="button" onclick="run()" disabled>適格性を判定する</button>
+    <p id="check-data-fallback" class="hint hidden" role="status"></p>
     <p class="disclaimer">これは検証用プロトタイプです。判定は募集要項の明示条件のみに基づく機械的なもので、採択可能性や適格性の認定を示すものではありません。最終判断は必ず各助成元の最新の募集要項でご確認ください。<br>🔒 入力内容はお使いのブラウザ内でのみ処理され、サーバーに送信・保存されることはありません。</p>
   </div>
 
@@ -283,7 +285,7 @@
 </div>
 </nav>
 
-<footer>データは各公式サイト・募集要項PDFで一次確認したもの（2026年7月時点）。66件は個別ルールで手厚く判定、残りは地域・分野の自動判定（対象者要件は要確認）。締切等は変動します。<br><a href="saved.html">あとで見る・比較</a></footer>
+<footer>一部の制度は個別ルールで判定します。それ以外の制度は、地域・分野などを照合し、個別の応募条件は公式要項で確認できます。<br><a href="saved.html">あとで見る・比較</a></footer>
 
 <script>
 /* ---------- 47都道府県 ---------- */
@@ -1380,26 +1382,62 @@ const PROGRAMS = [
  },
 ];
 
-/* ---------- 全制度データの読み込み（手厚いルール66件＋残り全件は汎用ルールで自動判定） ---------- */
-let ALL_PROGRAMS = PROGRAMS.slice();
-const CURATED_IDS = new Set(PROGRAMS.map(p=>p.id));
-const cityCandidates = new Set();
-fetch('data/programs.data.json').then(r=>r.json()).then(list=>{
-  const extra = list.filter(pr=>!CURATED_IDS.has(pr.id)).map(pr=>({
-    id:pr.id, name:pr.name, funder:pr.funder, region:pr.region,
-    deadline:pr.deadline, dlUrgent:!!pr.dlUrgent, amount:pr.amount,
-    payment:pr.payment||pr.cashflow||'未確認', cashflow:pr.cashflow||pr.payment||'未確認',
-    src:pr.src, softNote:pr.note||'', generic:true,
-    rules:genericRulesFor(pr),
-  }));
-  ALL_PROGRAMS = PROGRAMS.concat(extra);
-  list.forEach(pr=>{
-    const pref=PREF_LIST.find(s=>pr.region.startsWith(s));
-    if(pref){ const c=pr.region.slice(pref.length).trim(); if(c) cityCandidates.add(c); }
-  });
-  const dl=document.getElementById('cityDatalist');
-  if(dl) dl.innerHTML=[...cityCandidates].sort().map(c=>`<option value="${c}">`).join('');
-}).catch(e=>console.error('全件データの読み込みに失敗（66件の手厚い判定のみで継続）',e));
+/* ---------- 全制度データの読み込み ---------- */
+let ALL_PROGRAMS = PROGRAMS;
+
+function withRules(program, detailed) {
+  return {
+    ...detailed,
+    ...program,
+    cashflow: program.cashflow || program.payment || detailed?.cashflow || '未確認',
+    softNote: program.note || detailed?.softNote,
+    genForFunder: program.funderQ || detailed?.genForFunder,
+    generic: !detailed,
+    rules: detailed?.rules ?? genericRulesFor(program),
+  };
+}
+
+async function loadPrograms() {
+  const status = document.getElementById('check-data-status');
+  const button = document.getElementById('run-check');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 8000);
+  try {
+    const response = await fetch('data/programs.data.json', { cache: 'no-cache', signal: controller.signal });
+    if (!response.ok) throw new Error(`助成データ HTTP ${response.status}`);
+    const list = await response.json();
+    if (!Array.isArray(list) || !list.length) throw new Error('助成データに制度がありません');
+    const remaining = new Map(list.map(p => [p.id, p]));
+    if (remaining.size !== list.length || remaining.has(undefined)) throw new Error('助成データの掲載IDが不正です');
+
+    const detailed = [];
+    for (const program of PROGRAMS) {
+      if (!remaining.has(program.id)) continue;
+      detailed.push(withRules(remaining.get(program.id), program));
+      remaining.delete(program.id);
+    }
+    const programs = detailed.concat([...remaining.values()].map(p => withRules(p)));
+    const cities = new Set();
+    for (const { region } of list) {
+      const prefecture = PREF_LIST.find(pref => region.startsWith(pref));
+      const city = prefecture ? region.slice(prefecture.length).trim() : '';
+      if (city) cities.add(city);
+    }
+    document.getElementById('cityDatalist').replaceChildren(...[...cities].sort().map(city => new Option(city, city)));
+    ALL_PROGRAMS = programs;
+    status.textContent = `${programs.length}制度を判定対象（うち${detailed.length}制度は個別ルール）`;
+  } catch (error) {
+    status.textContent = `全制度を読み込めなかったため、個別ルールの${PROGRAMS.length}制度で判定します`;
+    const fallback = document.getElementById('check-data-fallback');
+    fallback.textContent = status.textContent;
+    fallback.classList.remove('hidden');
+    console.warn('助成データの読み込みに失敗しました', error);
+  } finally {
+    clearTimeout(timeout);
+    button.disabled = false;
+  }
+}
+const programsReady = loadPrograms();
 
 /* ---------- 判定 ---------- */
 function assess(program,p){
@@ -1417,6 +1455,9 @@ const V = {
 };
 const RICON={pass:'✓',fail:'×',needs_check:'?'};
 const RCLS={pass:'pass',fail:'fail',needs_check:'check'};
+const escapeHtml = value => String(value ?? '').replace(/[&<>"']/g, symbol => ({
+  '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;',
+})[symbol]);
 
 function run(){
   const p=readProfile();
@@ -1428,33 +1469,36 @@ function run(){
 
   function renderCard(a, bodyHidden){
     const v=V[a.verdict];
+    const source = /^https?:\/\//i.test(a.pr.src) ? escapeHtml(a.pr.src) : '';
     let s=`<div class="res">
       <div class="res-head" onclick="this.parentNode.querySelector('.res-body').classList.toggle('hidden')">
         <div>
-          <p class="res-title">${a.pr.name}</p>
-          <p class="res-funder">${a.pr.funder} ・ ${a.pr.region}</p>
+          <p class="res-title">${escapeHtml(a.pr.name)}</p>
+          <p class="res-funder">${escapeHtml(a.pr.funder)} ・ ${escapeHtml(a.pr.region)}</p>
         </div>
         <span class="verdict ${v.cls}">${v.label}</span>
       </div>
       <div class="res-body${bodyHidden?' hidden':''}">
         <div class="meta">
-          <span class="tag ${a.pr.dlUrgent?'dl':''}">締切: ${a.pr.deadline}</span>
-          <span class="tag">助成額: ${a.pr.amount}</span>
-          <span class="tag cash">💰 ${a.pr.cashflow}</span>
+          ${a.pr.statusLabel ? `<span class="tag">${escapeHtml(a.pr.statusLabel)}</span>` : ''}
+          <span class="tag ${a.pr.dlUrgent?'dl':''}">締切: ${escapeHtml(a.pr.deadline)}</span>
+          <span class="tag">助成額: ${escapeHtml(a.pr.amount)}</span>
+          <span class="tag cash">💰 ${escapeHtml(a.pr.cashflow)}</span>
           ${a.pr.generic?'<span class="tag">自動判定</span>':''}
         </div>`;
     a.results.forEach(r=>{
       s+=`<div class="rule ${RCLS[r.result]}">
         <span class="ic">${RICON[r.result]}</span>
-        <span class="txt"><b>${r.txt}</b>${r.why?`<span class="why">${r.why}</span>`:''}</span>
+        <span class="txt"><b>${escapeHtml(r.txt)}</b>${r.why?`<span class="why">${escapeHtml(r.why)}</span>`:''}</span>
       </div>`;
     });
-    if(a.pr.softNote) s+=`<p class="hint" style="margin-top:10px">ℹ️ ${a.pr.softNote}</p>`;
+    if(a.pr.softNote) s+=`<p class="hint" style="margin-top:10px">ℹ️ ${escapeHtml(a.pr.softNote)}</p>`;
     if(a.pr.cashflow.includes('未確認') && a.pr.genForFunder){
-      s+=`<div class="qbox"><p class="h">🗒️ 助成元への確認事項（自動生成）</p><p>${a.pr.genForFunder}</p></div>`;
+      s+=`<div class="qbox"><p class="h">🗒️ 助成元への確認事項（自動生成）</p><p>${escapeHtml(a.pr.genForFunder)}</p></div>`;
     }
-    s+=`<div class="src">📄 出典: <a href="${a.pr.src}" target="_blank" rel="noopener">${a.pr.funder} 公式ページ</a></div>
-      <p class="verified">${a.pr.generic ? 'この制度は地域・分野の自動判定です。対象者要件は「要確認」の内容を出典ページで必ずご確認ください。' : '最終確認: 一次資料（募集要項PDF等）で個別に確認済み'}</p>
+    s+=`${source ? `<div class="src">📄 出典: <a href="${source}" target="_blank" rel="noopener">${escapeHtml(a.pr.funder)} 公式ページ</a></div>` : ''}
+      ${a.pr.verified ? `<p class="verified">最終確認 ${escapeHtml(a.pr.verified)}${a.pr.verificationSource ? `（${escapeHtml(a.pr.verificationSource)}）` : ''}</p>` : ''}
+      ${a.pr.generic ? '<p class="verified">この制度は地域・分野などの自動判定です。個別の応募条件は公式要項でご確認ください。</p>' : ''}
     </div></div>`;
     return s;
   }

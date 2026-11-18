@@ -677,6 +677,33 @@ write('disclaimer.html', layout({
 </div>`,
 }));
 
+// 公開用の判定データは一覧と同じ締切判定を使う。開発時の原本はそのまま残す。
+if (OUTPUT_ROOT !== ROOT) {
+  const checkPage = readFileSync(join(ROOT, 'check.html'), 'utf8');
+  const publishedPrograms = programs.map((p) => ({
+    id: p.id,
+    name: p.name,
+    funder: p.funder,
+    region: p.region,
+    deadline: displayDeadline(p),
+    dlUrgent: p.dlUrgent,
+    statusLabel: recruitStatus(p).label,
+    amount: p.amount,
+    payment: p.payment,
+    cashflow: p.cashflow,
+    src: p.src,
+    note: p.note,
+    funderQ: p.funderQ,
+    verified: p.verified,
+    verificationSource: p.verificationSource,
+    genres: p.genres,
+    conditions: p.conditions,
+  }));
+  mkdirSync(join(OUTPUT_ROOT, 'data'), { recursive: true });
+  writeFileSync(join(OUTPUT_ROOT, 'data/programs.data.json'), JSON.stringify(publishedPrograms));
+  writeFileSync(join(OUTPUT_ROOT, 'check.html'), checkPage.replace('<head>\n', () => '<head>\n' + BUILD_SHA_META));
+}
+
 // ---- sitemap.xml / robots.txt ----
 {
   const staticPages = ['check.html'];
