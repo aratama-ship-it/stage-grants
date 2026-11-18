@@ -883,10 +883,10 @@ const PROGRAMS = [
  {
   id:'asahi', name:'朝日新聞文化財団 芸術活動助成金',
   funder:'朝日新聞文化財団', region:'全国',
-  deadline:'2026-10-25（受付中・2027年度実施分）', dlUrgent:true,
+  deadline:'2027年度実施分は2026年10月25日で受付終了', dlUrgent:false,
   amount:'上限100万円',
-  payment:'後払い（精算方式）。申請者名義の国内口座に振込',
-  cashflow:'後払い（前払いなし）',
+  payment:'採択決定後、必要書類を提出し、申請者名義の国内口座へ振込',
+  cashflow:'採択決定後に交付（対象事業は翌年度実施）',
   src:'https://www.asahizaidan.or.jp/grant/grant01.html',
   rules:[
     p=> (p.legalForm==='stock_company') ? FAIL('非営利であること','企業・営利団体は対象外') : PASS('個人・非営利/任意団体が応募可'),

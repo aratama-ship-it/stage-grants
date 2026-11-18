@@ -79,6 +79,8 @@ const GENRES = [
 const genresOf = (p) => (Array.isArray(p.genres) && p.genres.length ? p.genres : ['舞台']);
 const COMING = [];
 const openPrograms = programs.filter((p) => p.dlUrgent);
+const partialPrograms = programs.filter((p) => p.applicationStatus === 'partial');
+const otherPrograms = programs.filter((p) => !p.dlUrgent && p.applicationStatus !== 'partial');
 
 const SEARCH_CSS = `
 .searchbox{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px 16px;margin:16px 0;box-shadow:var(--shadow)}
@@ -316,7 +318,9 @@ ${body}
 function recruitStatus(p) {
   const t = p.deadline || '';
   if (p.dlExpired) return { label: '受付終了（締切日経過）', cls: '' };
-  if (p.dlUrgent || /受付中|募集中|随時|通年/.test(t)) return { label: '受付中', cls: 'ok' };
+  if (p.applicationStatus === 'partial') return { label: '一部受付', cls: 'ok' };
+  if (p.applicationStatus === 'closed') return { label: '受付終了', cls: '' };
+  if (p.dlUrgent) return { label: '受付中', cls: 'ok' };
   if (/締切済み|締め?切(り)?済|終了|募集は終了/.test(t)) return { label: '募集期間外（次回情報は未確認）', cls: '' };
   return { label: '募集時期は要確認', cls: '' };
 }
@@ -412,12 +416,12 @@ function write(rel, html) {
 ${CHIHO.map(([label, prefs]) => `<div class="prefgroup"><div class="gh">${label}</div><div class="prefs">${prefs.map(prefChip).join('')}</div></div>`).join('')}
 <div class="prefgroup"><div class="gh">海外</div><div class="prefs"><span class="pref" title="準備中">海外（準備中）</span></div></div>`;
 
-  const closedN = programs.length - openPrograms.length;
   const deadlinePane = `
 <p class="note" style="margin:2px 0 12px">締切・募集状況から探す。日付つきの月別カレンダーは今後拡充します。</p>
 <div class="regionbar">
 <a class="pref" href="calendar.html" style="font-size:14px;padding:9px 16px">いま受付中（${openPrograms.length}件）</a>
-<a class="pref" href="calendar.html" style="font-size:14px;padding:9px 16px">募集終了・次回待ち（${closedN}件）</a>
+<a class="pref" href="calendar.html#partial" style="font-size:14px;padding:9px 16px">一部受付（${partialPrograms.length}件）</a>
+<a class="pref" href="calendar.html#past" style="font-size:14px;padding:9px 16px">募集終了・次回待ち（${otherPrograms.length}件）</a>
 </div>
 <p><a class="cta" href="calendar.html">締切カレンダー・募集状況の一覧を見る →</a></p>`;
 
@@ -447,9 +451,11 @@ ${searchForm()}
 <div class="tabpane hidden" id="tab-deadline">${deadlinePane}</div>
 
 <h2>受付中の助成（${homeOpenPrograms.length}件を掲載）</h2>
-<p class="note" style="margin-top:-7px">トップでは受付中の助成を一部掲載しています。</p>
+${openPrograms.length > homeOpenPrograms.length ? '<p class="note" style="margin-top:-7px">トップでは受付中の助成を一部掲載しています。</p>' : ''}
 ${openList}
 ${openPrograms.length > homeOpenPrograms.length ? `<p><a class="cta" href="calendar.html">受付中の助成をすべて見る（${openPrograms.length}件）→</a></p>` : ''}
+<h2>一部受付（${partialPrograms.length}件）</h2>
+${partialPrograms.map((p) => gitem(p, '')).join('')}
 
 <div class="discl">これは開発中のプロトタイプです。適格性の判定は募集要項の明示条件のみに基づく機械的なもので、採択可能性を示すものではありません。</div>
 <script>
@@ -512,13 +518,14 @@ apply();
 
 // ---- 締切カレンダー ----
 {
-  const closed = programs.filter((p) => !p.dlUrgent);
   const body = `<h1>締切カレンダー・募集状況</h1>
 <p class="lede">「いま受付中」と「募集終了・次回の目安」を一覧。日付つきの月別カレンダーは今後拡充します。</p>
 <h2>いま受付中（${openPrograms.length}）</h2>
 ${openPrograms.map((p) => gitem(p, '')).join('') || '<p class="note">現在受付中の制度はありません。</p>'}
-<h2>現在は募集終了・次回待ち（${closed.length}）</h2>
-${closed.map((p) => gitem(p, '')).join('')}`;
+<h2 id="partial">一部受付（${partialPrograms.length}）</h2>
+${partialPrograms.map((p) => gitem(p, '')).join('')}
+<h2 id="past">現在は募集終了・次回待ち（${otherPrograms.length}）</h2>
+${otherPrograms.map((p) => gitem(p, '')).join('')}`;
   write('calendar.html', layout({ title: `締切カレンダー・募集状況｜${SITE_NAME}`, desc: `文化芸術助成の受付中・募集終了・次回の目安を一覧。`, rel: '', active: 'calendar', body }));
 }
 
@@ -563,7 +570,7 @@ for (const p of programs) {
 <div class="tags">${statusTags(p)}</div>
 <button class="save-toggle save-inline" type="button" data-save-id="${esc(p.id)}" data-save-name="${esc(p.name)}" aria-pressed="false">☆ あとで見る</button>
 <div class="card">
-<div class="kv"><div class="k">受付状態（本サイトの機械判定）</div><div class="v">${recruitStatus(p).label}</div></div>
+<div class="kv"><div class="k">受付状態</div><div class="v">${recruitStatus(p).label}</div></div>
 <div class="kv"><div class="k">受付状況・締切</div><div class="v">${esc(displayDeadline(p))}</div></div>
 <div class="kv"><div class="k">助成額</div><div class="v">${esc(p.amount)}</div></div>
 <div class="kv"><div class="k">支給時期（キャッシュフロー）</div><div class="v">${esc(p.cashflow)}<br><span class="note">${esc(p.payment)}</span></div></div>
@@ -571,6 +578,7 @@ for (const p of programs) {
 ${p.note ? `<p class="note">ℹ️ ${esc(p.note)}</p>` : ''}
 ${p.funderQ ? `<div class="qbox"><b>助成元への確認事項</b><br>${esc(p.funderQ)}</div>` : ''}
 <div class="src">📄 出典: <a href="${esc(p.src)}" target="_blank" rel="noopener">${esc(p.funder)} 公式ページ</a></div>
+${(p.relatedSources || []).map((source) => `<p class="note"><a href="${esc(source.url)}" target="_blank" rel="noopener">${esc(source.label)}</a></p>`).join('')}
 ${p.verified ? `<p class="verified fresh">✓ 最終確認：${esc(p.verified)}（${esc(p.verificationSource || '主催者公式ページ')}）</p>` : ''}
 <p class="verified">掲載情報は更新のタイミングにより、最新の募集状況と異なる場合があります。応募前に必ず公式の最新要項をご確認ください。</p>
 </div>
